@@ -43,7 +43,7 @@ app.use(session({
   cookie: { secure: false, maxAge: 604800000 }
 }));
 
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20971520, files: 20 } });
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 52428800, files: 20 } }); // 50MB per file
 const auth = (req, res, next) => req.session.userId ? next() : res.status(401).json({ error: 'Not authenticated' });
 
 // ── Auth routes ──────────────────────────────────────────────────────────────
@@ -104,7 +104,14 @@ app.delete('/api/projects/:id', auth, (req, res) => {
 });
 
 // ── AI analysis ──────────────────────────────────────────────────────────────
-app.post('/api/analyze', auth, upload.array('drawings', 20), async (req, res) => {
+app.post('/api/analyze', auth, (req, res, next) => {
+  upload.array('drawings', 20)(req, res, err => {
+    if (err && err.code === 'LIMIT_FILE_SIZE') return res.status(400).json({ error: 'File too large — max 50MB per file.' });
+    if (err && err.code === 'LIMIT_FILE_COUNT') return res.status(400).json({ error: 'Too many files — max 20.' });
+    if (err) return res.status(400).json({ error: err.message });
+    next();
+  });
+}, async (req, res) => {
   if (!process.env.ANTHROPIC_API_KEY) return res.status(500).json({ error: 'ANTHROPIC_API_KEY not set' });
   if (!req.files || !req.files.length) return res.status(400).json({ error: 'No files' });
   try {
