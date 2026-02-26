@@ -29,8 +29,7 @@ if (!users.find(u => u.username === 'naim2')) {
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-app.use(session({ secret: process.env.SESSION_SECRET || 'ni-secret-key', resave: false, saveUninitialized: false, cookie: { secure: false, maxAge: 604800000 } }));
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20971520, files: 20 } });
+app.use(session({ secret: process.env.SESSION_SECRET || 'ni-secret-key', resave: true, saveUninitialized: false, cookie: { secure: false, sameSite: 'lax', maxAge: 604800000 } }));const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20971520, files: 20 } });
 const auth = (req, res, next) => req.session.userId ? next() : res.status(401).json({ error: 'Not authenticated' });
 app.use(express.static(__dirname));
 
