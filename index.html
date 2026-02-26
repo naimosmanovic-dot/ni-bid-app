@@ -643,7 +643,6 @@ function setProg(pct, msg) {
   document.getElementById('progBar').style.width = pct + '%';
   document.getElementById('progStatus').textContent = msg;
 }
-const STEP_ICONS = ['📄','🔍','📐','💰','📊','✅'];
 function stepActive(i) { const s=document.getElementById('step'+i); s.className='prog-step active'; }
 function stepDone(i) { const s=document.getElementById('step'+i); s.className='prog-step done'; s.querySelector('.step-icon').textContent='✓'; }
 function delay(ms) { return new Promise(r=>setTimeout(r,ms)); }
