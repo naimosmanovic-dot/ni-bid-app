@@ -22,7 +22,8 @@ const rj = (f, d) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } ca
 const wj = (f, d) => fs.writeFileSync(f, JSON.stringify(d, null, 2));
 
 // Seed admin
-let users = rj(UF, []);
+let users = [];
+wj(UF, []);
 if (!users.find(u => u.username === 'naim')) {
   users.push({ id: uuid(), username: 'naim', password_hash: bcrypt.hashSync(process.env.ADMIN_PASSWORD || 'ni2026', 10), role: 'admin' });
   wj(UF, users);
@@ -35,6 +36,8 @@ app.use(session({ secret: process.env.SESSION_SECRET || 'ni-secret-key', resave:
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20971520, files: 20 } });
 const auth = (req, res, next) => req.session.userId ? next() : res.status(401).json({ error: 'Not authenticated' });
 app.use(express.static(__dirname));
+app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.listen(PORT, () => console.log('Running on ' + PORT + ' | key: ' + !!process.env.ANTHROPIC_API_KEY));
 
 // Auth routes
 app.post('/api/login', (req, res) => {
