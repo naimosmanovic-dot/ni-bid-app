@@ -21,59 +21,89 @@ const PF = path.join(DATA, 'projects.json');
 const rj = (f, d) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch(e) { return d; } };
 const wj = (f, d) => fs.writeFileSync(f, JSON.stringify(d, null, 2));
 
-// Seed admin
-let users = [];
-wj(UF, []);
+// Seed admin — read existing users first so we don't duplicate on restart
+let users = rj(UF, []);
 if (!users.find(u => u.username === 'naim')) {
-  users.push({ id: uuid(), username: 'naim', password_hash: bcrypt.hashSync(process.env.ADMIN_PASSWORD || 'ni2026', 10), role: 'admin' });
+  users.push({
+    id: uuid(),
+    username: 'naim',
+    password_hash: bcrypt.hashSync(process.env.ADMIN_PASSWORD || 'ni2026', 10),
+    role: 'admin'
+  });
   wj(UF, users);
 }
 
 // Middleware
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-app.use(session({ secret: process.env.SESSION_SECRET || 'ni-secret-key', resave: false, saveUninitialized: false, cookie: { secure: false, maxAge: 604800000 } }));
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'ni-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false, maxAge: 604800000 }
+}));
+
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20971520, files: 20 } });
 const auth = (req, res, next) => req.session.userId ? next() : res.status(401).json({ error: 'Not authenticated' });
-app.use(express.static(__dirname));
-app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
-app.listen(PORT, () => console.log('Running on ' + PORT + ' | key: ' + !!process.env.ANTHROPIC_API_KEY));
 
-// Auth routes
+// ── Auth routes ──────────────────────────────────────────────────────────────
 app.post('/api/login', (req, res) => {
   users = rj(UF, []);
   const u = users.find(u => u.username === req.body.username);
-  if (!u || !bcrypt.compareSync(req.body.password, u.password_hash)) return res.status(401).json({ error: 'Invalid credentials' });
-  req.session.userId = u.id; req.session.username = u.username; req.session.role = u.role;
+  if (!u || !bcrypt.compareSync(req.body.password, u.password_hash))
+    return res.status(401).json({ error: 'Invalid credentials' });
+  req.session.userId = u.id;
+  req.session.username = u.username;
+  req.session.role = u.role;
   res.json({ ok: true, username: u.username, role: u.role });
 });
-app.post('/api/logout', (req, res) => { req.session.destroy(); res.json({ ok: true }); });
-app.get('/api/me', auth, (req, res) => res.json({ username: req.session.username, role: req.session.role }));
 
-// Project routes
+app.post('/api/logout', (req, res) => {
+  req.session.destroy();
+  res.json({ ok: true });
+});
+
+app.get('/api/me', auth, (req, res) =>
+  res.json({ username: req.session.username, role: req.session.role })
+);
+
+// ── Project routes ───────────────────────────────────────────────────────────
 app.get('/api/projects', auth, (req, res) => {
   const all = rj(PF, []);
-  res.json(all.filter(p => p.user_id === req.session.userId).sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)));
+  res.json(all.filter(p => p.user_id === req.session.userId)
+               .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)));
 });
+
 app.post('/api/projects', auth, (req, res) => {
   const all = rj(PF, []);
-  const p = { id: uuid(), user_id: req.session.userId, ...req.body, created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
-  all.push(p); wj(PF, all); res.json(p);
+  const p = {
+    id: uuid(),
+    user_id: req.session.userId,
+    ...req.body,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  all.push(p);
+  wj(PF, all);
+  res.json(p);
 });
+
 app.put('/api/projects/:id', auth, (req, res) => {
   const all = rj(PF, []);
   const i = all.findIndex(p => p.id === req.params.id && p.user_id === req.session.userId);
   if (i < 0) return res.status(404).json({ error: 'Not found' });
   all[i] = { ...all[i], ...req.body, updated_at: new Date().toISOString() };
-  wj(PF, all); res.json(all[i]);
+  wj(PF, all);
+  res.json(all[i]);
 });
+
 app.delete('/api/projects/:id', auth, (req, res) => {
   const all = rj(PF, []);
   wj(PF, all.filter(p => !(p.id === req.params.id && p.user_id === req.session.userId)));
   res.json({ ok: true });
 });
 
-// AI analysis
+// ── AI analysis ──────────────────────────────────────────────────────────────
 app.post('/api/analyze', auth, upload.array('drawings', 20), async (req, res) => {
   if (!process.env.ANTHROPIC_API_KEY) return res.status(500).json({ error: 'ANTHROPIC_API_KEY not set' });
   if (!req.files || !req.files.length) return res.status(400).json({ error: 'No files' });
@@ -81,13 +111,19 @@ app.post('/api/analyze', auth, upload.array('drawings', 20), async (req, res) =>
     const content = [];
     for (const f of req.files) {
       const b64 = f.buffer.toString('base64');
-      if (f.mimetype === 'application/pdf') content.push({ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 } });
-      else if (f.mimetype.startsWith('image/')) content.push({ type: 'image', source: { type: 'base64', media_type: f.mimetype, data: b64 } });
+      if (f.mimetype === 'application/pdf')
+        content.push({ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 } });
+      else if (f.mimetype.startsWith('image/'))
+        content.push({ type: 'image', source: { type: 'base64', media_type: f.mimetype, data: b64 } });
     }
     content.push({ type: 'text', text: PROMPT });
     const r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01'
+      },
       body: JSON.stringify({ model: 'claude-opus-4-5', max_tokens: 4000, messages: [{ role: 'user', content }] })
     });
     if (!r.ok) throw new Error('API error: ' + await r.text());
@@ -102,24 +138,41 @@ app.post('/api/analyze', auth, upload.array('drawings', 20), async (req, res) =>
   }
 });
 
-// Excel export
+// ── Excel export ─────────────────────────────────────────────────────────────
 app.post('/api/export/excel', auth, (req, res) => {
   const p = req.body;
   const sub = (p.divisions || []).reduce((s, d) => s + d.items.reduce((ss, it) => ss + (parseFloat(it.cost) || 0), 0), 0);
-  const gc = Math.round(sub * (p.pct_gc || 8) / 100);
-  const oh = Math.round(sub * (p.pct_oh || 10) / 100);
-  const ins = Math.round(sub * (p.pct_ins || 8) / 100);
+  const gc  = Math.round(sub * (p.pct_gc  || 8)  / 100);
+  const oh  = Math.round(sub * (p.pct_oh  || 10) / 100);
+  const ins = Math.round(sub * (p.pct_ins || 8)  / 100);
   const grand = sub + gc + oh + ins;
   const f = n => n ? '$' + Math.round(n).toLocaleString('en-US') : '';
   const wb = XLSX.utils.book_new();
-  const rows = [['NI CONSTRUCTION CORP.'], ['Lic #2056165-DCA · 244 5th Ave Suite 2NB, New York NY 10001'], [], ['PROJECT:', p.address], ['ARCHITECT:', p.architect], ['PM:', p.pm], ['BID #:', p.bid_number], ['DATE:', p.date], [], ['DIV', 'LINE ITEM', 'REMARK', 'COST']];
+  const rows = [
+    ['NI CONSTRUCTION CORP.'],
+    ['Lic #2056165-DCA · 244 5th Ave Suite 2NB, New York NY 10001'],
+    [],
+    ['PROJECT:', p.address],
+    ['ARCHITECT:', p.architect],
+    ['PM:', p.pm],
+    ['BID #:', p.bid_number],
+    ['DATE:', p.date],
+    [],
+    ['DIV', 'LINE ITEM', 'REMARK', 'COST']
+  ];
   (p.divisions || []).forEach(div => {
     const dt = div.items.reduce((s, it) => s + (parseFloat(it.cost) || 0), 0);
     rows.push(['DIV ' + div.div, div.name, '', f(dt)]);
-    div.items.forEach(it => rows.push(['', '  ' + it.name, it.remark || '', it.cost ? f(it.cost) : '']));
+    div.items.forEach(it => rows.push(['', ' ' + it.name, it.remark || '', it.cost ? f(it.cost) : '']));
     rows.push([]);
   });
-  rows.push(['', 'SUBTOTAL', '', f(sub)], ['', 'GC (' + p.pct_gc + '%)', '', f(gc)], ['', 'OH (' + p.pct_oh + '%)', '', f(oh)], ['', 'Ins (' + p.pct_ins + '%)', '', f(ins)], ['', 'GRAND TOTAL', '', f(grand)]);
+  rows.push(
+    ['', 'SUBTOTAL',              '', f(sub)],
+    ['', 'GC ('  + p.pct_gc  + '%)', '', f(gc)],
+    ['', 'OH ('  + p.pct_oh  + '%)', '', f(oh)],
+    ['', 'Ins (' + p.pct_ins + '%)', '', f(ins)],
+    ['', 'GRAND TOTAL',           '', f(grand)]
+  );
   const ws = XLSX.utils.aoa_to_sheet(rows);
   ws['!cols'] = [{ wch: 8 }, { wch: 52 }, { wch: 22 }, { wch: 16 }];
   XLSX.utils.book_append_sheet(wb, ws, 'Proposal');
@@ -129,7 +182,12 @@ app.post('/api/export/excel', auth, (req, res) => {
   res.send(buf);
 });
 
+// ── Static files & catch-all (MUST be after all API routes) ──────────────────
+app.use(express.static(__dirname));
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+
+// ── Start server ─────────────────────────────────────────────────────────────
 app.listen(PORT, () => console.log('NI Bid App running on port ' + PORT + ' | API key: ' + !!process.env.ANTHROPIC_API_KEY));
 
+// ── AI Prompt ────────────────────────────────────────────────────────────────
 const PROMPT = 'You are an expert NYC construction estimator for NI Construction Corp (License #2056165-DCA). Analyze these architectural drawings and generate a detailed cost estimate. RATE CARD: Site protection $5k-$12k LS, Demo gut $28-42/SF selective $18-28/SF, Metal framing $8-12/SF, IKEA millwork $350-500/LF, Baseboard $5-8/LF, Door frames $300-450 EA, Waterproofing $4-8/SF, Sound mat $2.50-4/SF, Fire stopping $1500-3500 LS, Pivot doors $800-1400 EA, Pocket doors $900-1500 EA, GWB $10-16/SF, Skim coat $4-6/SF, Tile labor $14-28/SF, Stone saddle $180-280 EA, Wood floor $12-18/SF, Paint $1.80-2.50/SF, Shower glass $2800-5500, Plumbing rough $2200-3800 EA, Electrical $22-35/SF. NYC multipliers: pre-war +15%, 6th floor+ +8%, occupied +12%. RESPOND ONLY WITH THIS JSON FORMAT: ```json\n{"project_address":"","architect":"","scope_summary":"3 paragraph scope description","line_items":[{"division":"02","division_name":"EXISTING CONDITIONS","name":"Site Protection","remark":"","cost":6500}]}\n``` Include all divisions 02,05,06,07,08,09,10,22,26. Set cost 0 and remark "by owner" for owner-supplied items.';
