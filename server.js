@@ -22,8 +22,8 @@ const wj = (f, d) => fs.writeFileSync(f, JSON.stringify(d, null, 2));
 
 let users = rj(UF, []);
 users = [];
-if (!users.find(u => u.username === 'naim')) {
-  users.push({ id: uuid(), username: 'naim', password_hash: bcrypt.hashSync(process.env.ADMIN_PASSWORD || 'ni2026', 10), role: 'admin' });
+if (!users.find(u => u.username === 'naim2')) {
+  users.push({ id: uuid(), username: 'naim2', password_hash: bcrypt.hashSync(process.env.ADMIN_PASSWORD || 'ni2026', 10), role: 'admin' });
   wj(UF, users);
 }
 
