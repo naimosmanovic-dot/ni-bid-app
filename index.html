@@ -1,380 +1,147 @@
+bash
+
+cat /home/claude/ni-bid-app/client/public/index.html
+Output
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NI Construction — AI Bid Generator</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root {
-  --bg: #0a0c0f;
-  --surface: #111418;
-  --card: #161b22;
-  --card2: #1c2330;
-  --border: #21293a;
-  --border2: #2d3a4f;
-  --ink: #e8edf3;
-  --sub: #8899ae;
-  --muted: #4a5a6e;
-  --gold: #c8973a;
-  --gold2: #e0b968;
-  --teal: #3ecfb8;
-  --red: #e05c5c;
-  --green: #4ec98a;
-  --blue: #5b8dee;
-  --r: 8px;
+  --bg:#0a0c0f; --surface:#111418; --card:#161b22; --card2:#1c2330;
+  --border:#21293a; --border2:#2d3a4f;
+  --ink:#e8edf3; --sub:#8899ae; --muted:#4a5a6e;
+  --gold:#c8973a; --gold2:#e0b968; --teal:#3ecfb8;
+  --red:#e05c5c; --green:#4ec98a; --blue:#5b8dee;
+  --r:8px;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{height:100%;overflow:hidden;}
-body{
-  font-family:'DM Sans',sans-serif;
-  background:var(--bg);
-  color:var(--ink);
-  display:flex;
-  flex-direction:column;
-}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(200,151,58,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(200,151,58,.03) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
 
-/* ── GRID TEXTURE ── */
-body::before{
-  content:'';
-  position:fixed;inset:0;
-  background-image:
-    linear-gradient(rgba(200,151,58,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(200,151,58,0.03) 1px, transparent 1px);
-  background-size:48px 48px;
-  pointer-events:none;z-index:0;
-}
+/* LOGIN */
+#loginScreen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;}
+.login-box{background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:48px;width:400px;max-width:90vw;text-align:center;}
+.login-mark{width:56px;height:56px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:28px;color:#000;margin:0 auto 16px;}
+.login-title{font-family:'Bebas Neue';font-size:28px;letter-spacing:4px;margin-bottom:4px;}
+.login-sub{font-family:'DM Mono';font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:32px;}
+.login-field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;text-align:left;}
+.login-lbl{font-family:'DM Mono';font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;}
+.login-inp{background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--ink);font-family:'DM Sans';font-size:13px;padding:10px 12px;outline:none;transition:border-color .15s;width:100%;}
+.login-inp:focus{border-color:var(--gold);}
+.login-btn{width:100%;padding:12px;background:var(--gold);color:#000;border:none;border-radius:6px;font-family:'Bebas Neue';font-size:20px;letter-spacing:3px;cursor:pointer;margin-top:8px;transition:all .15s;}
+.login-btn:hover{background:var(--gold2);}
+.login-err{font-family:'DM Mono';font-size:11px;color:var(--red);margin-top:10px;min-height:16px;}
 
-/* ── HEADER ── */
-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 32px;height:58px;
-  background:rgba(17,20,24,0.95);
-  border-bottom:1px solid var(--border);
-  position:relative;z-index:10;
-  backdrop-filter:blur(12px);
-  flex-shrink:0;
-}
+/* HEADER */
+header{display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:56px;background:rgba(17,20,24,.95);border-bottom:1px solid var(--border);position:relative;z-index:10;flex-shrink:0;}
 .logoblock{display:flex;align-items:center;gap:12px;}
-.logomark{
-  width:34px;height:34px;
-  background:var(--gold);
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Bebas Neue';font-size:18px;color:#000;
-  letter-spacing:1px;
-}
-.logotxt{font-family:'Bebas Neue';font-size:20px;letter-spacing:4px;color:var(--ink);}
-.logosub{font-family:'DM Mono';font-size:9px;color:var(--muted);letter-spacing:2px;margin-top:-3px;}
-.hdr-badge{
-  font-family:'DM Mono';font-size:10px;letter-spacing:1px;
-  padding:4px 10px;border-radius:3px;
-  background:rgba(200,151,58,0.1);
-  border:1px solid rgba(200,151,58,0.25);
-  color:var(--gold2);
-}
+.logomark{width:32px;height:32px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:17px;color:#000;}
+.logotxt{font-family:'Bebas Neue';font-size:19px;letter-spacing:4px;}
+.logosub{font-family:'DM Mono';font-size:8px;color:var(--muted);letter-spacing:2px;margin-top:-3px;}
+.hdr-right{display:flex;align-items:center;gap:12px;}
+.hdr-user{font-family:'DM Mono';font-size:10px;color:var(--sub);}
+.hdr-logout{font-family:'DM Mono';font-size:10px;color:var(--muted);cursor:pointer;padding:4px 10px;border:1px solid var(--border);border-radius:4px;background:transparent;color:var(--sub);transition:all .15s;}
+.hdr-logout:hover{border-color:var(--sub);color:var(--ink);}
+.hdr-badge{font-family:'DM Mono';font-size:9px;letter-spacing:1px;padding:3px 9px;border-radius:3px;background:rgba(200,151,58,.1);border:1px solid rgba(200,151,58,.25);color:var(--gold2);}
 
-/* ── LAYOUT ── */
+/* LAYOUT */
 .layout{display:flex;flex:1;overflow:hidden;position:relative;z-index:1;}
 
-/* ── SIDEBAR ── */
-.sidebar{
-  width:280px;flex-shrink:0;
-  background:var(--surface);
-  border-right:1px solid var(--border);
-  display:flex;flex-direction:column;
-  overflow-y:auto;
-}
-.sb-section{padding:20px 16px 8px;}
-.sb-label{
-  font-family:'DM Mono';font-size:9px;letter-spacing:3px;
-  color:var(--muted);text-transform:uppercase;
-  padding:0 4px;margin-bottom:8px;
-}
-.sb-btn{
-  width:100%;padding:11px 14px;
-  background:var(--gold);color:#000;
-  border:none;border-radius:var(--r);
-  font-family:'DM Sans';font-weight:600;font-size:13px;
-  cursor:pointer;letter-spacing:.3px;
-  display:flex;align-items:center;gap:8px;
-  transition:all .15s;margin-bottom:16px;
-}
-.sb-btn:hover{background:var(--gold2);transform:translateY(-1px);}
-.proj-item{
-  padding:10px 12px;border-radius:6px;cursor:pointer;
-  border:1px solid transparent;transition:all .15s;
-  margin-bottom:3px;
-}
+/* SIDEBAR */
+.sidebar{width:268px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;}
+.sb-top{padding:16px;}
+.sb-btn{width:100%;padding:10px 14px;background:var(--gold);color:#000;border:none;border-radius:var(--r);font-family:'DM Sans';font-weight:600;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .15s;margin-bottom:12px;}
+.sb-btn:hover{background:var(--gold2);}
+.sb-label{font-family:'DM Mono';font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;padding:0 4px;margin-bottom:6px;}
+.proj-item{padding:10px 10px;border-radius:6px;cursor:pointer;border:1px solid transparent;transition:all .15s;margin-bottom:2px;}
 .proj-item:hover{background:var(--card);border-color:var(--border);}
 .proj-item.active{background:var(--card2);border-color:var(--gold);}
 .proj-addr{font-size:12px;font-weight:600;margin-bottom:3px;line-height:1.3;}
 .proj-row{display:flex;justify-content:space-between;align-items:center;}
-.proj-status{
-  font-family:'DM Mono';font-size:9px;letter-spacing:1px;
-  padding:2px 6px;border-radius:3px;
-}
+.proj-status{font-family:'DM Mono';font-size:9px;letter-spacing:1px;padding:2px 6px;border-radius:3px;}
 .s-draft{background:rgba(74,90,110,.2);color:var(--sub);}
 .s-sent{background:rgba(62,207,184,.1);color:var(--teal);border:1px solid rgba(62,207,184,.2);}
 .s-won{background:rgba(78,201,138,.1);color:var(--green);border:1px solid rgba(78,201,138,.2);}
 .s-lost{background:rgba(224,92,92,.1);color:var(--red);border:1px solid rgba(224,92,92,.2);}
 .proj-amt{font-family:'DM Mono';font-size:11px;color:var(--gold2);}
-.sb-div{border:none;border-top:1px solid var(--border);margin:8px 16px;}
+.sb-empty{font-family:'DM Mono';font-size:10px;color:var(--muted);padding:8px 4px;text-align:center;}
 
-/* ── MAIN ── */
+/* MAIN */
 main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+.view{display:none;flex:1;padding:28px 36px;flex-direction:column;}
+.view.active{display:flex;}
 
-/* ── VIEWS ── */
-.view{display:none;flex:1;padding:32px 40px;}
-.view.active{display:flex;flex-direction:column;}
-
-/* ── UPLOAD VIEW ── */
-.upload-hero{
-  flex:1;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  gap:32px;
-}
-.upload-title{
-  font-family:'Bebas Neue';font-size:64px;letter-spacing:6px;
-  text-align:center;line-height:1;
-  background:linear-gradient(135deg,var(--ink) 0%,var(--gold2) 60%,var(--gold) 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-}
-.upload-sub{
-  font-family:'DM Mono';font-size:12px;letter-spacing:2px;
-  color:var(--sub);text-align:center;margin-top:-16px;
-}
-.drop-zone{
-  width:560px;max-width:90vw;
-  border:2px dashed var(--border2);border-radius:12px;
-  padding:48px 40px;text-align:center;
-  cursor:pointer;transition:all .2s;
-  background:var(--card);
-  position:relative;
-}
-.drop-zone:hover,.drop-zone.dragover{
-  border-color:var(--gold);
-  background:rgba(200,151,58,0.05);
-}
-.drop-icon{font-size:40px;margin-bottom:14px;opacity:.6;}
-.drop-main{font-size:15px;font-weight:500;margin-bottom:6px;}
-.drop-sub{font-family:'DM Mono';font-size:11px;color:var(--muted);}
-.drop-input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-.file-chips{
-  display:flex;flex-wrap:wrap;gap:8px;
-  justify-content:center;margin-top:16px;
-}
-.chip{
-  display:flex;align-items:center;gap:6px;
-  padding:5px 10px;border-radius:4px;
-  background:var(--card2);border:1px solid var(--border2);
-  font-family:'DM Mono';font-size:10px;color:var(--sub);
-}
-.chip-x{cursor:pointer;color:var(--muted);font-size:12px;line-height:1;}
-.chip-x:hover{color:var(--red);}
-
-.proj-meta-fields{
-  display:grid;grid-template-columns:1fr 1fr;gap:12px;
-  width:560px;max-width:90vw;
-}
+/* UPLOAD VIEW */
+.upload-hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;}
+.upload-title{font-family:'Bebas Neue';font-size:58px;letter-spacing:6px;text-align:center;line-height:1;background:linear-gradient(135deg,var(--ink) 0%,var(--gold2) 60%,var(--gold) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.upload-sub{font-family:'DM Mono';font-size:11px;letter-spacing:2px;color:var(--sub);text-align:center;margin-top:-16px;}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:540px;max-width:90vw;}
 .field-g{display:flex;flex-direction:column;gap:5px;}
 .field-lbl{font-family:'DM Mono';font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;}
-.field-inp{
-  background:var(--card);border:1px solid var(--border);border-radius:6px;
-  color:var(--ink);font-family:'DM Sans';font-size:13px;
-  padding:9px 12px;outline:none;transition:border-color .15s;
-}
+.field-inp{background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--ink);font-family:'DM Sans';font-size:13px;padding:8px 11px;outline:none;transition:border-color .15s;}
 .field-inp:focus{border-color:var(--gold);}
 .field-inp::placeholder{color:var(--muted);}
+.drop-zone{width:540px;max-width:90vw;border:2px dashed var(--border2);border-radius:10px;padding:40px;text-align:center;cursor:pointer;transition:all .2s;background:var(--card);position:relative;}
+.drop-zone:hover,.drop-zone.over{border-color:var(--gold);background:rgba(200,151,58,.05);}
+.drop-icon{font-size:36px;margin-bottom:12px;opacity:.6;}
+.drop-main{font-size:14px;font-weight:500;margin-bottom:4px;}
+.drop-sub{font-family:'DM Mono';font-size:10px;color:var(--muted);}
+.drop-input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.file-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:14px;}
+.chip{display:flex;align-items:center;gap:6px;padding:4px 9px;border-radius:3px;background:var(--card2);border:1px solid var(--border2);font-family:'DM Mono';font-size:10px;color:var(--sub);}
+.chip-x{cursor:pointer;color:var(--muted);font-size:11px;}
+.chip-x:hover{color:var(--red);}
+.gen-btn{padding:13px 36px;background:var(--gold);color:#000;border:none;border-radius:var(--r);font-family:'Bebas Neue';font-size:21px;letter-spacing:4px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:10px;}
+.gen-btn:hover{background:var(--gold2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(200,151,58,.25);}
+.gen-btn:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none;}
 
-.generate-btn{
-  padding:14px 40px;
-  background:var(--gold);color:#000;
-  border:none;border-radius:var(--r);
-  font-family:'Bebas Neue';font-size:22px;letter-spacing:4px;
-  cursor:pointer;transition:all .2s;
-  display:flex;align-items:center;gap:12px;
-}
-.generate-btn:hover{background:var(--gold2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(200,151,58,.25);}
-.generate-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
-
-/* ── PROGRESS VIEW ── */
-.progress-view{
-  flex:1;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:28px;
-}
-.prog-title{
-  font-family:'Bebas Neue';font-size:36px;letter-spacing:4px;color:var(--gold2);
-}
-.prog-status{
-  font-family:'DM Mono';font-size:12px;color:var(--sub);
-  letter-spacing:1px;text-align:center;min-height:20px;
-}
-.prog-bar-wrap{
-  width:480px;max-width:80vw;height:3px;
-  background:var(--border);border-radius:2px;overflow:hidden;
-}
-.prog-bar{
-  height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));
-  border-radius:2px;transition:width .4s ease;width:0%;
-}
-.prog-steps{
-  display:flex;flex-direction:column;gap:8px;
-  width:480px;max-width:80vw;
-}
-.prog-step{
-  display:flex;align-items:center;gap:12px;
-  font-family:'DM Mono';font-size:11px;color:var(--muted);
-  transition:color .3s;
-}
+/* PROGRESS */
+.progress-view{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;}
+.prog-title{font-family:'Bebas Neue';font-size:34px;letter-spacing:4px;color:var(--gold2);}
+.prog-bar-wrap{width:460px;max-width:80vw;height:2px;background:var(--border);border-radius:2px;overflow:hidden;}
+.prog-bar{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:2px;transition:width .4s ease;width:0%;}
+.prog-status{font-family:'DM Mono';font-size:11px;color:var(--sub);letter-spacing:1px;text-align:center;}
+.prog-steps{display:flex;flex-direction:column;gap:7px;width:460px;max-width:80vw;}
+.prog-step{display:flex;align-items:center;gap:10px;font-family:'DM Mono';font-size:10px;color:var(--muted);transition:color .3s;}
 .prog-step.active{color:var(--ink);}
 .prog-step.done{color:var(--green);}
-.step-icon{width:18px;text-align:center;font-size:13px;}
+.step-icon{width:16px;text-align:center;}
 
-/* ── BID VIEW ── */
-.bid-header{
-  display:flex;justify-content:space-between;align-items:flex-start;
-  margin-bottom:24px;padding-bottom:20px;
-  border-bottom:1px solid var(--border);
-  flex-shrink:0;
-}
-.bid-title{font-family:'Bebas Neue';font-size:38px;letter-spacing:3px;line-height:1;}
-.bid-meta{font-family:'DM Mono';font-size:10px;color:var(--muted);letter-spacing:1px;margin-top:4px;}
+/* BID VIEW */
+.bid-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.bid-title{font-family:'Bebas Neue';font-size:34px;letter-spacing:3px;line-height:1;}
+.bid-meta-txt{font-family:'DM Mono';font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:4px;}
 .bid-stats{display:flex;gap:20px;align-items:flex-start;}
 .stat-b{text-align:right;}
-.stat-lbl{font-family:'DM Mono';font-size:9px;letter-spacing:2px;color:var(--muted);margin-bottom:3px;}
-.stat-val{font-family:'Bebas Neue';font-size:30px;letter-spacing:2px;color:var(--gold2);line-height:1;}
-.stat-val.sm{font-size:15px;color:var(--ink);}
-.status-sel{
-  background:var(--card);border:1px solid var(--border);border-radius:4px;
-  color:var(--ink);font-family:'DM Mono';font-size:10px;padding:5px 8px;
-  outline:none;cursor:pointer;
-}
+.stat-lbl{font-family:'DM Mono';font-size:9px;letter-spacing:2px;color:var(--muted);margin-bottom:2px;}
+.stat-val{font-family:'Bebas Neue';font-size:28px;letter-spacing:2px;color:var(--gold2);line-height:1;}
+.status-sel{background:var(--card);border:1px solid var(--border);border-radius:4px;color:var(--ink);font-family:'DM Mono';font-size:10px;padding:5px 8px;outline:none;cursor:pointer;}
 
-/* ── TABS ── */
-.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);flex-shrink:0;margin-bottom:20px;}
-.tab{
-  padding:9px 18px;font-size:13px;font-weight:500;color:var(--muted);
-  cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;
-  transition:all .15s;
-}
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;margin-bottom:16px;}
+.tab{padding:8px 16px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;}
 .tab:hover{color:var(--ink);}
 .tab.active{color:var(--gold2);border-bottom-color:var(--gold);}
 
-/* ── SCOPE SUMMARY ── */
-.scope-box{
-  background:var(--card);border:1px solid var(--border);border-radius:var(--r);
-  padding:16px 20px;margin-bottom:16px;
-  font-family:'DM Mono';font-size:11px;color:var(--sub);
-  line-height:1.8;max-height:160px;overflow-y:auto;
-  white-space:pre-wrap;flex-shrink:0;
-}
-.scope-box strong{color:var(--gold2);font-weight:500;}
-
-/* ── MARKUP ROW ── */
-.markup-row{
-  display:flex;align-items:center;gap:16px;
-  padding:12px 16px;background:var(--card);
-  border:1px solid var(--border);border-radius:var(--r);
-  margin-bottom:16px;flex-shrink:0;flex-wrap:wrap;
-}
+/* MARKUP ROW */
+.markup-row{display:flex;align-items:center;gap:14px;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;flex-shrink:0;flex-wrap:wrap;}
 .mk-label{font-family:'DM Mono';font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;}
-.mk-field{display:flex;align-items:center;gap:6px;}
-.mk-inp{
-  width:54px;background:var(--surface);border:1px solid var(--border);
-  border-radius:4px;color:var(--ink);font-family:'DM Mono';font-size:12px;
-  padding:4px 8px;text-align:center;outline:none;transition:border-color .15s;
-}
+.mk-field{display:flex;align-items:center;gap:5px;}
+.mk-inp{width:50px;background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--ink);font-family:'DM Mono';font-size:11px;padding:4px 7px;text-align:center;outline:none;transition:border-color .15s;}
 .mk-inp:focus{border-color:var(--gold);}
-.mk-pct{font-family:'DM Mono';font-size:11px;color:var(--muted);}
-.mk-note{margin-left:auto;font-family:'DM Mono';font-size:10px;color:var(--muted);}
+.mk-pct{font-family:'DM Mono';font-size:10px;color:var(--muted);}
+.mk-note{margin-left:auto;font-family:'DM Mono';font-size:9px;color:var(--muted);}
 
-/* ── DIVISION BLOCKS ── */
-.divs-wrap{flex:1;overflow-y:auto;min-height:0;}
-.div-block{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:var(--r);margin-bottom:8px;overflow:hidden;
-}
-.div-hdr{
-  display:grid;grid-template-columns:56px 1fr auto 16px;
-  align-items:center;gap:12px;
-  padding:10px 16px;background:var(--card2);
-  cursor:pointer;user-select:none;transition:background .15s;
-}
-.div-hdr:hover{background:#1f2d42;}
-.div-num{
-  font-family:'DM Mono';font-size:9px;letter-spacing:1px;color:var(--gold);
-  background:rgba(200,151,58,.1);padding:3px 6px;border-radius:3px;text-align:center;
-}
-.div-name{font-size:12px;font-weight:600;letter-spacing:.4px;}
-.div-tot{font-family:'DM Mono';font-size:12px;color:var(--gold2);text-align:right;}
-.div-chev{color:var(--muted);font-size:10px;transition:transform .2s;}
-.div-block.collapsed .div-chev{transform:rotate(-90deg);}
-.div-block.collapsed .div-items{display:none;}
-.div-items{border-top:1px solid var(--border);}
-.li-row{
-  display:grid;grid-template-columns:1fr 180px 90px;
-  align-items:center;gap:12px;padding:8px 16px;
-  border-bottom:1px solid rgba(33,41,58,.5);transition:background .1s;
-}
-.li-row:last-child{border-bottom:none;}
-.li-row:hover{background:rgba(255,255,255,.015);}
-.li-name{font-size:12px;color:var(--sub);}
-.li-rem{font-family:'DM Mono';font-size:9px;color:rgba(136,153,174,.45);font-style:italic;margin-top:2px;}
-.li-rem.owner{color:rgba(62,207,184,.5);}
-.li-inp{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:4px;color:var(--ink);font-family:'DM Mono';font-size:11px;
-  padding:5px 9px;text-align:right;outline:none;width:100%;
-  transition:border-color .15s;
-}
-.li-inp:focus{border-color:var(--gold);}
-.li-inp.owner{
-  background:transparent;border-color:transparent;color:var(--muted);
-  font-style:italic;pointer-events:none;
-}
-.li-tot{font-family:'DM Mono';font-size:11px;color:var(--ink);text-align:right;}
-.li-tot.z{color:var(--muted);}
-
-/* ── TOTALS ── */
-.totals-block{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:var(--r);overflow:hidden;margin-top:12px;flex-shrink:0;
-}
-.t-row{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:10px 18px;border-bottom:1px solid rgba(33,41,58,.5);
-}
-.t-row:last-child{border-bottom:none;}
-.t-lbl{font-size:12px;color:var(--sub);display:flex;align-items:center;gap:8px;}
-.t-pct{font-family:'DM Mono';font-size:9px;color:var(--muted);background:var(--surface);padding:2px 5px;border-radius:2px;}
-.t-val{font-family:'DM Mono';font-size:12px;color:var(--ink);}
-.t-grand{
-  background:linear-gradient(135deg,rgba(200,151,58,.12),rgba(224,185,120,.05));
-  border-top:1px solid rgba(200,151,58,.3)!important;padding:14px 18px;
-}
-.t-grand .t-lbl{font-family:'Bebas Neue';font-size:20px;letter-spacing:3px;color:var(--gold2);}
-.t-grand .t-val{font-family:'Bebas Neue';font-size:32px;letter-spacing:2px;color:var(--gold2);}
-
-/* ── EXPORT TAB ── */
-.export-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
-.export-card{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:var(--r);padding:24px;cursor:pointer;
-  transition:all .2s;text-align:center;
-}
-.export-card:hover{border-color:var(--gold);background:rgba(200,151,58,.04);transform:translateY(-2px);}
-.export-icon{font-size:32px;margin-bottom:12px;}
-.export-label{font-family:'Bebas Neue';font-size:20px;letter-spacing:2px;margin-bottom:6px;}
-.export-desc{font-family:'DM Mono';font-size:10px;color:var(--muted);}
-
-/* ── ACTION BAR ── */
-.action-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;flex-shrink:0;}
-.btn{
-  padding:8px 16px;border-radius:6px;font-family:'DM Sans';font-size:12px;
-  font-weight:500;cursor:pointer;border:none;transition:all .15s;
-  display:flex;align-items:center;gap:6px;
-}
+/* ACTION BAR */
+.action-bar{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap;flex-shrink:0;}
+.btn{padding:7px 14px;border-radius:5px;font-family:'DM Sans';font-size:12px;font-weight:500;cursor:pointer;border:none;transition:all .15s;display:flex;align-items:center;gap:5px;}
 .btn-p{background:var(--gold);color:#000;}
 .btn-p:hover{background:var(--gold2);}
 .btn-s{background:var(--card2);color:var(--ink);border:1px solid var(--border);}
@@ -382,40 +149,91 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
 .btn-d{background:rgba(224,92,92,.1);color:var(--red);border:1px solid rgba(224,92,92,.2);}
 .btn-d:hover{background:rgba(224,92,92,.2);}
 
-/* ── MODAL ── */
-.overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);
-  z-index:200;display:none;align-items:center;justify-content:center;
-}
-.overlay.open{display:flex;}
-.modal{
-  background:var(--card);border:1px solid var(--border2);
-  border-radius:12px;padding:32px;width:500px;
-  max-width:90vw;max-height:90vh;overflow-y:auto;
-}
-.modal-title{font-family:'Bebas Neue';font-size:26px;letter-spacing:3px;margin-bottom:22px;}
-.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;}
+/* DIV BLOCKS */
+.divs-wrap{flex:1;overflow-y:auto;min-height:0;}
+.div-block{background:var(--card);border:1px solid var(--border);border-radius:var(--r);margin-bottom:6px;overflow:hidden;}
+.div-hdr{display:grid;grid-template-columns:52px 1fr auto 14px;align-items:center;gap:10px;padding:9px 14px;background:var(--card2);cursor:pointer;user-select:none;transition:background .15s;}
+.div-hdr:hover{background:#1f2d42;}
+.div-num{font-family:'DM Mono';font-size:9px;letter-spacing:1px;color:var(--gold);background:rgba(200,151,58,.1);padding:2px 5px;border-radius:2px;text-align:center;}
+.div-name{font-size:12px;font-weight:600;letter-spacing:.3px;}
+.div-tot{font-family:'DM Mono';font-size:11px;color:var(--gold2);text-align:right;}
+.div-chev{color:var(--muted);font-size:9px;transition:transform .2s;}
+.div-block.collapsed .div-chev{transform:rotate(-90deg);}
+.div-block.collapsed .div-items{display:none;}
+.div-items{border-top:1px solid var(--border);}
+.li-row{display:grid;grid-template-columns:1fr 160px 82px;align-items:center;gap:10px;padding:7px 14px;border-bottom:1px solid rgba(33,41,58,.5);transition:background .1s;}
+.li-row:last-child{border-bottom:none;}
+.li-row:hover{background:rgba(255,255,255,.015);}
+.li-name{font-size:11px;color:var(--sub);}
+.li-rem{font-family:'DM Mono';font-size:9px;color:rgba(136,153,174,.4);font-style:italic;margin-top:1px;}
+.li-rem.owner{color:rgba(62,207,184,.45);}
+.li-inp{background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--ink);font-family:'DM Mono';font-size:11px;padding:4px 8px;text-align:right;outline:none;width:100%;transition:border-color .15s;}
+.li-inp:focus{border-color:var(--gold);}
+.li-inp.owner{background:transparent;border-color:transparent;color:var(--muted);font-style:italic;pointer-events:none;}
+.li-tot{font-family:'DM Mono';font-size:11px;color:var(--ink);text-align:right;}
+.li-tot.z{color:var(--muted);}
 
-/* ── TOAST ── */
-#toast{
-  position:fixed;bottom:24px;right:24px;
-  background:var(--card2);border:1px solid var(--border2);
-  border-left:3px solid var(--gold);border-radius:6px;
-  padding:11px 16px;font-size:13px;color:var(--ink);
-  opacity:0;transform:translateY(8px);transition:all .25s;
-  z-index:300;pointer-events:none;
-}
+/* TOTALS */
+.totals-block{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-top:10px;flex-shrink:0;}
+.t-row{display:flex;justify-content:space-between;align-items:center;padding:9px 16px;border-bottom:1px solid rgba(33,41,58,.5);}
+.t-row:last-child{border-bottom:none;}
+.t-lbl{font-size:12px;color:var(--sub);display:flex;align-items:center;gap:7px;}
+.t-pct{font-family:'DM Mono';font-size:9px;color:var(--muted);background:var(--surface);padding:2px 4px;border-radius:2px;}
+.t-val{font-family:'DM Mono';font-size:12px;color:var(--ink);}
+.t-grand{background:linear-gradient(135deg,rgba(200,151,58,.12),rgba(224,185,120,.05));border-top:1px solid rgba(200,151,58,.3)!important;padding:13px 16px;}
+.t-grand .t-lbl{font-family:'Bebas Neue';font-size:18px;letter-spacing:3px;color:var(--gold2);}
+.t-grand .t-val{font-family:'Bebas Neue';font-size:30px;letter-spacing:2px;color:var(--gold2);}
+
+/* SCOPE TAB */
+.scope-box{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;flex:1;overflow-y:auto;font-family:'DM Mono';font-size:11px;color:var(--sub);line-height:1.9;white-space:pre-wrap;}
+
+/* EXPORT GRID */
+.export-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
+.export-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:22px;cursor:pointer;transition:all .2s;text-align:center;}
+.export-card:hover{border-color:var(--gold);background:rgba(200,151,58,.04);transform:translateY(-2px);}
+.export-icon{font-size:28px;margin-bottom:10px;}
+.export-label{font-family:'Bebas Neue';font-size:18px;letter-spacing:2px;margin-bottom:4px;}
+.export-desc{font-family:'DM Mono';font-size:9px;color:var(--muted);}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:200;display:none;align-items:center;justify-content:center;}
+.overlay.open{display:flex;}
+.modal{background:var(--card);border:1px solid var(--border2);border-radius:10px;padding:28px;width:460px;max-width:90vw;max-height:90vh;overflow-y:auto;}
+.modal-title{font-family:'Bebas Neue';font-size:24px;letter-spacing:3px;margin-bottom:20px;}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px;}
+
+/* TOAST */
+#toast{position:fixed;bottom:20px;right:20px;background:var(--card2);border:1px solid var(--border2);border-left:3px solid var(--gold);border-radius:6px;padding:10px 15px;font-size:12px;color:var(--ink);opacity:0;transform:translateY(6px);transition:all .25s;z-index:300;pointer-events:none;}
 #toast.show{opacity:1;transform:translateY(0);}
 #toast.err{border-left-color:var(--red);}
 
-/* ── SCROLLBAR ── */
-::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar{width:4px;height:4px;}
 ::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 </style>
 </head>
 <body>
 
+<!-- LOGIN SCREEN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-mark">NI</div>
+    <div class="login-title">NI Construction</div>
+    <div class="login-sub">AI BID GENERATOR · LIC. #2056165-DCA</div>
+    <div class="login-field">
+      <div class="login-lbl">Username</div>
+      <input class="login-inp" id="loginUser" placeholder="naim" autocomplete="username" />
+    </div>
+    <div class="login-field">
+      <div class="login-lbl">Password</div>
+      <input class="login-inp" id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()" />
+    </div>
+    <button class="login-btn" onclick="doLogin()">SIGN IN →</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- HEADER -->
 <header>
   <div class="logoblock">
     <div class="logomark">NI</div>
@@ -424,15 +242,18 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
       <div class="logosub">AI BID GENERATOR · LIC. #2056165-DCA</div>
     </div>
   </div>
-  <div class="hdr-badge">Powered by Claude AI</div>
+  <div class="hdr-right">
+    <span class="hdr-badge">Claude AI</span>
+    <span class="hdr-user" id="hdrUser"></span>
+    <button class="hdr-logout" onclick="doLogout()">Sign Out</button>
+  </div>
 </header>
 
 <div class="layout">
-
   <!-- SIDEBAR -->
   <nav class="sidebar">
-    <div class="sb-section">
-      <button class="sb-btn" onclick="showUpload()">＋ New Bid from Drawings</button>
+    <div class="sb-top">
+      <button class="sb-btn" onclick="showUpload()">⚡ New AI Bid</button>
       <div class="sb-label">Projects</div>
       <div id="projList"></div>
     </div>
@@ -445,16 +266,16 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
       <div class="upload-hero">
         <div>
           <div class="upload-title">AI BID<br>GENERATOR</div>
-          <div class="upload-sub">Upload drawings → Claude reads them → Bid is generated</div>
+          <div class="upload-sub">Upload drawings → Claude reads them → Bid generated</div>
         </div>
 
-        <div class="proj-meta-fields">
+        <div class="meta-grid">
           <div class="field-g">
-            <div class="field-lbl">Project Address</div>
+            <div class="field-lbl">Project Address *</div>
             <input class="field-inp" id="up_addr" placeholder="102 West 85th St Apt 6G & 6H" />
           </div>
           <div class="field-g">
-            <div class="field-lbl">Architect / Designer</div>
+            <div class="field-lbl">Architect</div>
             <input class="field-inp" id="up_arch" placeholder="Atelier036 Studio of Architecture" />
           </div>
           <div class="field-g">
@@ -471,12 +292,12 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
           <input type="file" class="drop-input" id="fileInput" accept=".pdf,image/*" multiple onchange="handleFiles(this.files)" />
           <div class="drop-icon">📐</div>
           <div class="drop-main">Drop drawing PDFs or images here</div>
-          <div class="drop-sub">PDF · JPG · PNG — multiple files supported</div>
+          <div class="drop-sub">PDF · JPG · PNG — multiple files OK</div>
           <div class="file-chips" id="fileChips"></div>
         </div>
 
-        <button class="generate-btn" id="genBtn" onclick="startGeneration()" disabled>
-          <span>⚡</span> GENERATE BID WITH AI
+        <button class="gen-btn" id="genBtn" onclick="startGeneration()" disabled>
+          ⚡ GENERATE BID WITH AI
         </button>
       </div>
     </div>
@@ -488,22 +309,23 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
         <div class="prog-bar-wrap"><div class="prog-bar" id="progBar"></div></div>
         <div class="prog-status" id="progStatus">Initializing...</div>
         <div class="prog-steps" id="progSteps">
-          <div class="prog-step" id="step0"><span class="step-icon">📄</span> Reading drawing files</div>
-          <div class="prog-step" id="step1"><span class="step-icon">🔍</span> Extracting scope of work</div>
-          <div class="prog-step" id="step2"><span class="step-icon">📐</span> Measuring quantities from plans</div>
-          <div class="prog-step" id="step3"><span class="step-icon">💰</span> Applying NYC calibrated rate card</div>
-          <div class="prog-step" id="step4"><span class="step-icon">📊</span> Generating bid breakdown</div>
-          <div class="prog-step" id="step5"><span class="step-icon">✅</span> Finalizing proposal</div>
+          <div class="prog-step" id="step0"><span class="step-icon">📄</span>Reading drawing files</div>
+          <div class="prog-step" id="step1"><span class="step-icon">🔍</span>Extracting scope of work</div>
+          <div class="prog-step" id="step2"><span class="step-icon">📐</span>Measuring quantities from plans</div>
+          <div class="prog-step" id="step3"><span class="step-icon">💰</span>Applying NYC calibrated rate card</div>
+          <div class="prog-step" id="step4"><span class="step-icon">📊</span>Building bid breakdown</div>
+          <div class="prog-step" id="step5"><span class="step-icon">✅</span>Saving to your account</div>
         </div>
       </div>
     </div>
 
     <!-- BID VIEW -->
     <div class="view" id="view-bid">
-      <div class="bid-header">
+
+      <div class="bid-hdr">
         <div>
           <div class="bid-title" id="bidAddr">—</div>
-          <div class="bid-meta" id="bidMeta">—</div>
+          <div class="bid-meta-txt" id="bidMeta">—</div>
         </div>
         <div class="bid-stats">
           <div class="stat-b">
@@ -512,7 +334,7 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
           </div>
           <div class="stat-b">
             <div class="stat-lbl">Status</div>
-            <select class="status-sel" onchange="changeStatus(this.value)" id="statusSel">
+            <select class="status-sel" id="statusSel" onchange="changeStatus(this.value)">
               <option value="draft">DRAFT</option>
               <option value="sent">SENT</option>
               <option value="won">WON</option>
@@ -538,22 +360,10 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
         </div>
         <div class="markup-row">
           <span class="mk-label">Markups:</span>
-          <div class="mk-field">
-            <span style="font-size:12px;color:var(--sub)">GC</span>
-            <input class="mk-inp" id="mkGC" type="number" value="8" min="0" max="99" oninput="recalc()">
-            <span class="mk-pct">%</span>
-          </div>
-          <div class="mk-field">
-            <span style="font-size:12px;color:var(--sub)">OH&P</span>
-            <input class="mk-inp" id="mkOH" type="number" value="10" min="0" max="99" oninput="recalc()">
-            <span class="mk-pct">%</span>
-          </div>
-          <div class="mk-field">
-            <span style="font-size:12px;color:var(--sub)">Insurance</span>
-            <input class="mk-inp" id="mkIns" type="number" value="8" min="0" max="99" oninput="recalc()">
-            <span class="mk-pct">%</span>
-          </div>
-          <span class="mk-note">Rate card: NI #2030a21 (52 Riverside Dr, Feb 2026)</span>
+          <div class="mk-field"><span style="font-size:11px;color:var(--sub)">GC</span><input class="mk-inp" id="mkGC" type="number" value="8" min="0" max="99" oninput="recalc()"><span class="mk-pct">%</span></div>
+          <div class="mk-field"><span style="font-size:11px;color:var(--sub)">OH&P</span><input class="mk-inp" id="mkOH" type="number" value="10" min="0" max="99" oninput="recalc()"><span class="mk-pct">%</span></div>
+          <div class="mk-field"><span style="font-size:11px;color:var(--sub)">Ins</span><input class="mk-inp" id="mkIns" type="number" value="8" min="0" max="99" oninput="recalc()"><span class="mk-pct">%</span></div>
+          <span class="mk-note">Rate card: NI #2030a21 · 52 Riverside Dr</span>
         </div>
         <div class="divs-wrap" id="divsWrap"></div>
         <div class="totals-block">
@@ -566,11 +376,9 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
       </div>
 
       <!-- SCOPE TAB -->
-      <div id="tb-scope" style="display:none;flex:1;min-height:0;">
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:24px;height:100%;overflow-y:auto;">
-          <div style="font-family:'DM Mono';font-size:9px;letter-spacing:2px;color:var(--muted);margin-bottom:12px;">AI ANALYSIS — SCOPE EXTRACTED FROM DRAWINGS</div>
-          <div id="scopeNotes" style="font-family:'DM Mono';font-size:11px;color:var(--sub);line-height:1.9;white-space:pre-wrap;"></div>
-        </div>
+      <div id="tb-scope" style="display:none;flex:1;min-height:0;flex-direction:column;">
+        <div style="font-family:'DM Mono';font-size:9px;letter-spacing:2px;color:var(--muted);margin-bottom:10px;">AI SCOPE EXTRACTED FROM DRAWINGS</div>
+        <div class="scope-box" id="scopeNotes"></div>
       </div>
 
       <!-- EXPORT TAB -->
@@ -579,12 +387,12 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
           <div class="export-card" onclick="exportExcel()">
             <div class="export-icon">📊</div>
             <div class="export-label">Excel Bid Form</div>
-            <div class="export-desc">Standard NI bid form format<br>Compatible with architect bid forms</div>
+            <div class="export-desc">NI Proposal + architect bid form<br>Two sheets, ready to submit</div>
           </div>
           <div class="export-card" onclick="exportPDF()">
             <div class="export-icon">📄</div>
             <div class="export-label">NI Proposal PDF</div>
-            <div class="export-desc">Branded NI Construction Corp.<br>proposal ready to send</div>
+            <div class="export-desc">Branded proposal, print-ready<br>Opens print dialog</div>
           </div>
           <div class="export-card" onclick="exportCSV()">
             <div class="export-icon">📋</div>
@@ -594,10 +402,9 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
           <div class="export-card" onclick="copySummary()">
             <div class="export-icon">⎘</div>
             <div class="export-label">Copy Summary</div>
-            <div class="export-desc">Bid summary to clipboard<br>for email or text</div>
+            <div class="export-desc">Bid summary to clipboard<br>for email or text message</div>
           </div>
         </div>
-        <div id="pdfPreview" style="display:none;"></div>
       </div>
 
     </div><!-- /view-bid -->
@@ -609,23 +416,11 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
 <div class="overlay" id="addLineOverlay">
   <div class="modal">
     <div class="modal-title">Add Line Item</div>
-    <div style="display:flex;flex-direction:column;gap:14px;">
-      <div class="field-g">
-        <div class="field-lbl">Division</div>
-        <select class="field-inp" id="al_div"></select>
-      </div>
-      <div class="field-g">
-        <div class="field-lbl">Description</div>
-        <input class="field-inp" id="al_name" placeholder="e.g. Shower enclosure supply + install" />
-      </div>
-      <div class="field-g">
-        <div class="field-lbl">Remark (optional)</div>
-        <input class="field-inp" id="al_remark" placeholder="e.g. by owner, included above" />
-      </div>
-      <div class="field-g">
-        <div class="field-lbl">Cost ($)</div>
-        <input class="field-inp" id="al_cost" type="number" placeholder="0" min="0" />
-      </div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="field-g"><div class="field-lbl">Division</div><select class="field-inp" id="al_div"></select></div>
+      <div class="field-g"><div class="field-lbl">Description</div><input class="field-inp" id="al_name" placeholder="e.g. Shower enclosure supply + install" /></div>
+      <div class="field-g"><div class="field-lbl">Remark (optional)</div><input class="field-inp" id="al_remark" placeholder="e.g. by owner" /></div>
+      <div class="field-g"><div class="field-lbl">Cost ($)</div><input class="field-inp" id="al_cost" type="number" placeholder="0" min="0" /></div>
     </div>
     <div class="modal-actions">
       <button class="btn btn-s" onclick="closeAddLine()">Cancel</button>
@@ -636,253 +431,211 @@ main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
 
 <div id="toast"></div>
 
-<!-- HIDDEN PDF FRAME -->
-<iframe id="pdfFrame" style="display:none;"></iframe>
-
 <script>
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // STATE
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 let projects = [];
 let currentId = null;
-let uploadedFiles = []; // {name, b64, mediaType}
+let uploadedFiles = [];
 
-const DIVS_TEMPLATE = [
-  { div:'02', name:'EXISTING CONDITIONS', items:[
-    {name:'Site Protection — interior and public hallways', remark:'', cost:0},
-    {name:'Demolition — interior and waste management', remark:'', cost:0},
-  ]},
-  { div:'05', name:'METALS', items:[
-    {name:'Cold formed metal framing', remark:'', cost:0},
-  ]},
-  { div:'06', name:'WOOD AND PLASTICS', items:[
-    {name:'Interior arch millwork', remark:'IKEA — receive and fabricate', cost:0},
-    {name:'Baseboard and trims', remark:'', cost:0},
-    {name:'Interior wood door frames', remark:'', cost:0},
-    {name:'Solid surfacing fabrication', remark:'', cost:0},
-  ]},
-  { div:'07', name:'THERMAL AND MOISTURE PROTECTION', items:[
-    {name:'Waterproofing', remark:'', cost:0},
-    {name:'Blanket insulation and soundproofing', remark:'', cost:0},
-    {name:'Joint sealant', remark:'', cost:0},
-    {name:'Fire stopping and fire resisting joint system', remark:'', cost:0},
-  ]},
-  { div:'08', name:'OPENINGS', items:[
-    {name:'Wood doors with lites', remark:'', cost:0},
-    {name:'Hardware (Pivot Hinges, Magnets, Door Stops and Pocket Door)', remark:'', cost:0},
-  ]},
-  { div:'09', name:'FINISHES', items:[
-    {name:'Gypsum board assemblies', remark:'', cost:0},
-    {name:'Metal furring', remark:'', cost:0},
-    {name:'Suspension system', remark:'', cost:0},
-    {name:'Ceramic tiling', remark:'', cost:0},
-    {name:'Porcelain tiling', remark:'', cost:0},
-    {name:'Tile adhesive, mortar and grouts', remark:'tile by owner', cost:0},
-    {name:'Waterproofing membrane', remark:'', cost:0},
-    {name:'Stone — bathroom saddle', remark:'', cost:0},
-    {name:'Engineered wood floor', remark:'', cost:0},
-    {name:'Countertops', remark:'', cost:0},
-    {name:'Interior painting and priming (wall, ceiling, baseboard)', remark:'', cost:0},
-  ]},
-  { div:'10', name:'SPECIALTIES', items:[
-    {name:'Bathroom accessories', remark:'', cost:0},
-    {name:'Bathroom furniture', remark:'', cost:0},
-    {name:'Glass at bathroom wall', remark:'', cost:0},
-    {name:'Shower enclosure', remark:'', cost:0},
-  ]},
-  { div:'22', name:'PLUMBING — Kitchen', items:[
-    {name:'Plumbing rough and fitting', remark:'', cost:0},
-    {name:'Plumbing trims', remark:'by owner', cost:0},
-  ]},
-  { div:'22B', name:'PLUMBING — Main Bathroom', items:[
-    {name:'Plumbing rough and fitting', remark:'', cost:0},
-    {name:'Plumbing trims', remark:'by owner', cost:0},
-  ]},
-  { div:'22C', name:'PLUMBING — Master Bathroom', items:[
-    {name:'Plumbing rough and fitting', remark:'', cost:0},
-    {name:'Plumbing trims', remark:'by owner', cost:0},
-  ]},
-  { div:'26', name:'ELECTRICAL', items:[
-    {name:'Low voltage elec power conductors and cable', remark:'', cost:0},
-    {name:'Grounding and bonding for elec systems', remark:'', cost:0},
-    {name:'Raceway and boxes for elec systems', remark:'', cost:0},
-    {name:'Lighting control devices', remark:'', cost:0},
-    {name:'Panelboards', remark:'', cost:0},
-    {name:'Wiring devices', remark:'', cost:0},
-    {name:'Interior lighting', remark:'by owner', cost:0},
-  ]},
+const DIV_TEMPLATE = [
+  {div:'02',name:'EXISTING CONDITIONS',items:[{name:'Site Protection — interior and public hallways',remark:'',cost:0},{name:'Demolition — interior and waste management',remark:'',cost:0}]},
+  {div:'05',name:'METALS',items:[{name:'Cold formed metal framing',remark:'',cost:0}]},
+  {div:'06',name:'WOOD AND PLASTICS',items:[{name:'Interior arch millwork',remark:'IKEA — receive and fabricate',cost:0},{name:'Baseboard and trims',remark:'',cost:0},{name:'Interior wood door frames',remark:'',cost:0},{name:'Solid surfacing fabrication',remark:'',cost:0}]},
+  {div:'07',name:'THERMAL AND MOISTURE PROTECTION',items:[{name:'Waterproofing',remark:'',cost:0},{name:'Blanket insulation and soundproofing',remark:'',cost:0},{name:'Joint sealant',remark:'',cost:0},{name:'Fire stopping and fire resisting joint system',remark:'',cost:0}]},
+  {div:'08',name:'OPENINGS',items:[{name:'Wood doors with lites',remark:'',cost:0},{name:'Hardware (Pivot Hinges, Magnets, Door Stops and Pocket Door)',remark:'',cost:0}]},
+  {div:'09',name:'FINISHES',items:[{name:'Gypsum board assemblies',remark:'',cost:0},{name:'Metal furring',remark:'',cost:0},{name:'Suspension system',remark:'',cost:0},{name:'Ceramic tiling',remark:'',cost:0},{name:'Porcelain tiling',remark:'',cost:0},{name:'Tile adhesive, mortar and grouts',remark:'tile by owner',cost:0},{name:'Waterproofing membrane',remark:'',cost:0},{name:'Stone — bathroom saddle',remark:'',cost:0},{name:'Engineered wood floor',remark:'',cost:0},{name:'Countertops',remark:'',cost:0},{name:'Interior painting and priming',remark:'',cost:0}]},
+  {div:'10',name:'SPECIALTIES',items:[{name:'Bathroom accessories',remark:'',cost:0},{name:'Bathroom furniture',remark:'',cost:0},{name:'Glass at bathroom wall',remark:'',cost:0},{name:'Shower enclosure',remark:'',cost:0}]},
+  {div:'22',name:'PLUMBING — Kitchen',items:[{name:'Plumbing rough and fitting',remark:'',cost:0},{name:'Plumbing trims',remark:'by owner',cost:0}]},
+  {div:'22B',name:'PLUMBING — Main Bathroom',items:[{name:'Plumbing rough and fitting',remark:'',cost:0},{name:'Plumbing trims',remark:'by owner',cost:0}]},
+  {div:'22C',name:'PLUMBING — Master Bathroom',items:[{name:'Plumbing rough and fitting',remark:'',cost:0},{name:'Plumbing trims',remark:'by owner',cost:0}]},
+  {div:'26',name:'ELECTRICAL',items:[{name:'Low voltage elec power conductors and cable',remark:'',cost:0},{name:'Grounding and bonding for elec systems',remark:'',cost:0},{name:'Raceway and boxes for elec systems',remark:'',cost:0},{name:'Lighting control devices',remark:'',cost:0},{name:'Panelboards',remark:'',cost:0},{name:'Wiring devices',remark:'',cost:0},{name:'Interior lighting',remark:'by owner',cost:0}]},
 ];
 
-// ═══════════════════════════════════════════════════════════════
-// STORAGE
-// ═══════════════════════════════════════════════════════════════
-function save() { try { localStorage.setItem('ni_v2', JSON.stringify(projects)); } catch(e){} }
-function load() {
-  try { const d = localStorage.getItem('ni_v2'); if(d) projects = JSON.parse(d); } catch(e){}
+// ═══════════════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════════════
+async function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  document.getElementById('loginErr').textContent = '';
+  try {
+    const r = await api('POST', '/api/login', {username:u, password:p});
+    document.getElementById('hdrUser').textContent = r.username;
+    document.getElementById('loginScreen').style.display = 'none';
+    loadProjects();
+  } catch(e) {
+    document.getElementById('loginErr').textContent = 'Invalid username or password';
+  }
+}
+
+async function doLogout() {
+  await api('POST', '/api/logout');
+  location.reload();
+}
+
+// Check if already logged in
+async function checkAuth() {
+  try {
+    const r = await api('GET', '/api/me');
+    document.getElementById('hdrUser').textContent = r.username;
+    document.getElementById('loginScreen').style.display = 'none';
+    loadProjects();
+  } catch(e) { /* show login */ }
+}
+
+// ═══════════════════════════════════════════════════════════
+// API HELPER
+// ═══════════════════════════════════════════════════════════
+async function api(method, url, body) {
+  const opts = { method, headers:{}, credentials:'include' };
+  if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
+  const r = await fetch(url, opts);
+  if (!r.ok) { const e = await r.json().catch(()=>({error:r.statusText})); throw new Error(e.error||r.statusText); }
+  return r.json();
+}
+
+// ═══════════════════════════════════════════════════════════
+// PROJECTS
+// ═══════════════════════════════════════════════════════════
+async function loadProjects() {
+  projects = await api('GET', '/api/projects');
+  renderSidebar();
+  if (projects.length > 0) openProject(projects[0].id);
+}
+
+async function saveProject(p) {
+  const payload = {
+    address: p.address, architect: p.architect, pm: p.pm,
+    bid_number: p.bid_number, date: p.date, status: p.status,
+    pct_gc: p.pct_gc, pct_oh: p.pct_oh, pct_ins: p.pct_ins,
+    scope_notes: p.scope_notes, divisions: p.divisions
+  };
+  if (p.id && projects.find(x=>x.id===p.id)) {
+    return api('PUT', `/api/projects/${p.id}`, payload);
+  } else {
+    return api('POST', '/api/projects', payload);
+  }
 }
 
 function getProj() { return projects.find(p => p.id === currentId); }
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // FILE HANDLING
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 const dz = document.getElementById('dropZone');
-dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
-dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
-dz.addEventListener('drop', e => {
-  e.preventDefault(); dz.classList.remove('dragover');
-  handleFiles(e.dataTransfer.files);
-});
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('over'); handleFiles(e.dataTransfer.files); });
 
 function handleFiles(files) {
   Array.from(files).forEach(file => {
     const reader = new FileReader();
     reader.onload = ev => {
-      const b64 = ev.target.result.split(',')[1];
-      const mt = file.type || 'application/pdf';
-      uploadedFiles.push({ name: file.name, b64, mediaType: mt });
-      renderChips();
-      checkReady();
+      uploadedFiles.push({ name: file.name, data: ev.target.result, type: file.type });
+      renderChips(); checkReady();
     };
     reader.readAsDataURL(file);
   });
 }
 
 function renderChips() {
-  document.getElementById('fileChips').innerHTML = uploadedFiles.map((f,i) => `
-    <div class="chip">
-      📄 ${f.name}
-      <span class="chip-x" onclick="removeFile(${i})">✕</span>
-    </div>`).join('');
+  document.getElementById('fileChips').innerHTML = uploadedFiles.map((f,i) =>
+    `<div class="chip">📄 ${f.name} <span class="chip-x" onclick="removeFile(${i})">✕</span></div>`
+  ).join('');
 }
 
-function removeFile(i) {
-  uploadedFiles.splice(i,1);
-  renderChips();
-  checkReady();
-}
+function removeFile(i) { uploadedFiles.splice(i,1); renderChips(); checkReady(); }
+function checkReady() { document.getElementById('genBtn').disabled = uploadedFiles.length === 0; }
 
-function checkReady() {
-  document.getElementById('genBtn').disabled = uploadedFiles.length === 0;
-}
-
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // AI GENERATION
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 async function startGeneration() {
   const addr = document.getElementById('up_addr').value.trim();
   if (!addr) { toast('Please enter a project address','err'); return; }
-  if (!uploadedFiles.length) { toast('Please upload at least one drawing file','err'); return; }
 
   showView('progress');
-  setProgress(0, 'Reading drawing files...');
+  setProg(0, 'Uploading drawing files...');
   stepActive(0);
 
   try {
-    // Build content array for Claude — include all uploaded files
-    const content = [];
-
-    // Add all drawing files
+    // Build FormData for file upload
+    const fd = new FormData();
     for (const f of uploadedFiles) {
-      if (f.mediaType === 'application/pdf') {
-        content.push({ type:'document', source:{ type:'base64', media_type:'application/pdf', data:f.b64 }});
-      } else {
-        content.push({ type:'image', source:{ type:'base64', media_type:f.mediaType, data:f.b64 }});
-      }
+      const blob = await (await fetch(f.data)).blob();
+      fd.append('drawings', blob, f.name);
     }
 
-    // Add the prompt
-    content.push({ type:'text', text: ANALYSIS_PROMPT });
-
-    setProgress(20, 'Sending drawings to Claude AI...');
+    setProg(15, 'Sending drawings to Claude AI...');
     stepDone(0); stepActive(1);
 
-    const response = await fetch("https://ni-bid-backend.onrender.com/api/messages", {
-      method:'POST',
-      headers:{ 'Content-Type':'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 4000,
-        messages: [{ role:'user', content }]
-      })
+    const r = await fetch('/api/analyze', {
+      method: 'POST', body: fd, credentials: 'include'
     });
+    if (!r.ok) { const e = await r.json(); throw new Error(e.error); }
 
-    if (!response.ok) throw new Error('API error: ' + response.status);
-
-    setProgress(50, 'Extracting scope and quantities...');
+    setProg(55, 'Extracting scope and quantities...');
     stepDone(1); stepActive(2);
 
-    const data = await response.json();
-    const rawText = data.content.map(b => b.text || '').join('');
+    const { bidData } = await r.json();
 
-    setProgress(70, 'Parsing bid data...');
+    setProg(70, 'Applying NI rate card...');
     stepDone(2); stepActive(3);
 
-    // Parse the JSON from Claude's response
-    const jsonMatch = rawText.match(/```json\s*([\s\S]*?)\s*```/) || rawText.match(/(\{[\s\S]*\})/);
-    if (!jsonMatch) throw new Error('Could not parse bid data from response');
+    // Build project object
+    const divisions = JSON.parse(JSON.stringify(DIV_TEMPLATE));
 
-    const bidData = JSON.parse(jsonMatch[1]);
-
-    setProgress(85, 'Applying NI rate card...');
-    stepDone(3); stepActive(4);
-
-    // Build project
-    const proj = {
-      id: Date.now() + Math.random(),
-      address: addr || bidData.project_address || '',
-      architect: document.getElementById('up_arch').value || bidData.architect || '',
-      pm: document.getElementById('up_pm').value || 'Naim Ibrahimov',
-      bidNumber: document.getElementById('up_bidnum').value || ('NI-' + new Date().getFullYear() + '-' + Math.floor(Math.random()*9000+1000)),
-      date: new Date().toLocaleDateString('en-US',{month:'long',day:'2-digit',year:'numeric'}),
-      status: 'draft',
-      pctGC: 8, pctOH: 10, pctIns: 8,
-      scopeNotes: bidData.scope_summary || rawText.substring(0, 2000),
-      divisions: JSON.parse(JSON.stringify(DIVS_TEMPLATE)),
-    };
-
-    // Apply prices from Claude's output
     if (bidData.line_items) {
       bidData.line_items.forEach(item => {
-        // Find matching division
-        const divIdx = proj.divisions.findIndex(d =>
+        const di = divisions.findIndex(d =>
           d.div === String(item.division) ||
-          d.name.toLowerCase().includes((item.division_name||'').toLowerCase())
+          d.name.toLowerCase().includes((item.division_name||'').toLowerCase().substring(0,10))
         );
-        if (divIdx >= 0) {
-          // Find matching line item
-          const liIdx = proj.divisions[divIdx].items.findIndex(li =>
-            li.name.toLowerCase().includes((item.name||'').toLowerCase().substring(0,15)) ||
-            (item.name||'').toLowerCase().includes(li.name.toLowerCase().substring(0,15))
+        if (di >= 0) {
+          const li = divisions[di].items.findIndex(x =>
+            x.name.toLowerCase().includes((item.name||'').toLowerCase().substring(0,14)) ||
+            (item.name||'').toLowerCase().includes(x.name.toLowerCase().substring(0,14))
           );
-          if (liIdx >= 0) {
-            proj.divisions[divIdx].items[liIdx].cost = item.cost || 0;
-            if (item.remark) proj.divisions[divIdx].items[liIdx].remark = item.remark;
+          if (li >= 0) {
+            divisions[di].items[li].cost = item.cost || 0;
+            if (item.remark) divisions[di].items[li].remark = item.remark;
           } else {
-            // Add as new item if no match
-            proj.divisions[divIdx].items.push({
-              name: item.name,
-              remark: item.remark || '',
-              cost: item.cost || 0
-            });
+            divisions[di].items.push({ name: item.name, remark: item.remark||'', cost: item.cost||0 });
           }
         }
       });
     }
 
-    setProgress(95, 'Finalizing proposal...');
+    setProg(85, 'Building bid breakdown...');
+    stepDone(3); stepActive(4);
+
+    const proj = {
+      address: addr || bidData.project_address || '',
+      architect: document.getElementById('up_arch').value || bidData.architect || '',
+      pm: document.getElementById('up_pm').value || 'Naim Ibrahimov',
+      bid_number: document.getElementById('up_bidnum').value || ('NI-' + new Date().getFullYear() + '-' + Math.floor(Math.random()*9000+1000)),
+      date: new Date().toLocaleDateString('en-US',{month:'long',day:'2-digit',year:'numeric'}),
+      status: 'draft',
+      pct_gc: 8, pct_oh: 10, pct_ins: 8,
+      scope_notes: bidData.scope_summary || '',
+      divisions
+    };
+
+    setProg(95, 'Saving to your account...');
     stepDone(4); stepActive(5);
 
-    projects.push(proj);
-    save();
-    currentId = proj.id;
+    const saved = await saveProject(proj);
+    projects.unshift(saved);
+    currentId = saved.id;
 
-    setProgress(100, 'Done!');
+    setProg(100, 'Done!');
     stepDone(5);
 
     await delay(600);
     renderSidebar();
-    openProject(proj.id);
+    openProject(saved.id);
 
   } catch(err) {
     console.error(err);
@@ -891,152 +644,77 @@ async function startGeneration() {
   }
 }
 
-const ANALYSIS_PROMPT = `You are an expert NYC construction estimator for NI Construction Corp (License #2056165-DCA).
-
-Analyze these architectural drawings carefully. Extract ALL scope items and generate a detailed cost estimate using these CALIBRATED NYC PRE-WAR BUILDING RATES (from NI's actual completed proposal #2030a21, 52 Riverside Dr, $548K, Feb 2026):
-
-RATE CARD:
-- Site protection: $5,000–$12,000 LS depending on apt size
-- Demo full gut: $28–$42/SF; selective demo: $18–$28/SF
-- Metal stud framing: $8–$12/SF
-- IKEA millwork receive+fab: $350–$500/LF total run
-- Standard millwork: $1,050/LF base cabinets, $925/LF upper cabinets
-- Baseboard/trim: $5–$8/LF
-- Door frames (wood): $300–$450 EA
-- Waterproofing (Laticrete 9235): $4–$8/SF
-- Sound mat (Regupol): $2.50–$4/SF
-- SAFB acoustic batt: $1.80–$2.50/SF
-- Joint sealant + fire stopping: $1,500–$3,500 LS
-- Solid core wood doors (pivot, MDF): $800–$1,400 EA incl. hardware
-- Pocket/sliding doors: $900–$1,500 EA incl. Cavilock hardware
-- GWB assemblies (frame+board+tape): $10–$16/SF
-- Level 5 skim coat: $4–$6/SF
-- Ceramic tile setting (labor): $14–$22/SF (tile by owner)
-- Porcelain tile setting (labor): $18–$28/SF (tile by owner)
-- Stone saddle: $180–$280 EA
-- Engineered wood floor install: $12–$18/SF installed
-- Interior paint (walls+ceil): $1.80–$2.50/SF
-- Bath accessories install: $300–$600/room
-- Shower glass enclosure: $2,800–$5,500 supply+install
-- Plumbing rough-in per fixture: $2,200–$3,800 EA
-- Plumbing connect (fixtures by owner): $800–$1,400 EA
-- Electrical full rewire: $22–$35/SF (fixtures by owner if noted)
-- Electrical selective: $12–$20/SF
-
-NYC OCCUPIED BUILDING MULTIPLIERS:
-- Pre-war building: +15%
-- 6th floor+: +8% elevator/logistics
-- Occupied building: +12% tenant protection
-
-RESPOND ONLY WITH THIS EXACT JSON FORMAT (no other text, no markdown outside the json block):
-
-\`\`\`json
-{
-  "project_address": "address from drawings",
-  "architect": "architect name from drawings",
-  "scope_summary": "2-3 paragraph detailed scope description: what rooms are being renovated, what's being demolished, what's new, what's by owner, approximate SF, number of baths, kitchen type, door count, etc.",
-  "line_items": [
-    {
-      "division": "02",
-      "division_name": "EXISTING CONDITIONS",
-      "name": "Site Protection — interior and public hallways",
-      "remark": "",
-      "quantity": 1,
-      "unit": "LS",
-      "cost": 6500
-    },
-    {
-      "division": "02",
-      "division_name": "EXISTING CONDITIONS", 
-      "name": "Demolition — interior and waste management",
-      "remark": "",
-      "quantity": 1350,
-      "unit": "SF",
-      "cost": 38000
-    }
-  ]
-}
-\`\`\`
-
-Include ALL line items from the standard CSI divisions: 02, 05, 06, 07, 08, 09, 10, 22, 26.
-For items that are "by owner" per drawings, set cost to 0 and note "by owner" in remark.
-Be precise — read actual dimensions from plans. Justify each cost against the rate card.`;
-
-function setProgress(pct, msg) {
+function setProg(pct, msg) {
   document.getElementById('progBar').style.width = pct + '%';
   document.getElementById('progStatus').textContent = msg;
 }
-function stepActive(i) { document.getElementById('step'+i).className = 'prog-step active'; }
-function stepDone(i) { document.getElementById('step'+i).className = 'prog-step done'; document.getElementById('step'+i).querySelector('.step-icon').textContent = '✓'; }
-function delay(ms) { return new Promise(r => setTimeout(r,ms)); }
+const STEP_ICONS = ['📄','🔍','📐','💰','📊','✅'];
+function stepActive(i) { const s=document.getElementById('step'+i); s.className='prog-step active'; }
+function stepDone(i) { const s=document.getElementById('step'+i); s.className='prog-step done'; s.querySelector('.step-icon').textContent='✓'; }
+function delay(ms) { return new Promise(r=>setTimeout(r,ms)); }
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // RENDER BID
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 function openProject(id) {
   currentId = id;
-  const p = getProj();
-  if (!p) return;
+  const p = getProj(); if(!p) return;
   showView('bid');
   document.getElementById('bidAddr').textContent = p.address.split(',')[0];
-  document.getElementById('bidMeta').textContent = p.bidNumber + ' · ' + p.architect + ' · ' + p.date;
+  document.getElementById('bidMeta').textContent = p.bid_number + ' · ' + p.architect + ' · ' + p.date;
   document.getElementById('statusSel').value = p.status;
-  document.getElementById('mkGC').value = p.pctGC ?? 8;
-  document.getElementById('mkOH').value = p.pctOH ?? 10;
-  document.getElementById('mkIns').value = p.pctIns ?? 8;
-  document.getElementById('scopeNotes').textContent = p.scopeNotes || 'No scope notes available.';
-
-  // Populate add-line division select
+  document.getElementById('mkGC').value  = p.pct_gc  ?? 8;
+  document.getElementById('mkOH').value  = p.pct_oh  ?? 10;
+  document.getElementById('mkIns').value = p.pct_ins ?? 8;
+  document.getElementById('scopeNotes').textContent = p.scope_notes || 'No scope notes.';
+  // populate add-line division select
   const sel = document.getElementById('al_div');
-  sel.innerHTML = p.divisions.map((d,i)=>`<option value="${i}">Div ${d.div} — ${d.name}</option>`).join('');
-
+  sel.innerHTML = (p.divisions||[]).map((d,i)=>`<option value="${i}">Div ${d.div} — ${d.name}</option>`).join('');
   renderDivisions();
   recalc();
   renderSidebar();
 }
 
 function renderDivisions() {
-  const p = getProj();
+  const p = getProj(); if(!p) return;
   const wrap = document.getElementById('divsWrap');
   wrap.innerHTML = '';
-  p.divisions.forEach((div, di) => {
-    const divTot = div.items.reduce((s,it)=>s+(parseFloat(it.cost)||0),0);
+  (p.divisions||[]).forEach((div,di) => {
+    const dt = div.items.reduce((s,it)=>s+(parseFloat(it.cost)||0),0);
     const el = document.createElement('div');
-    el.className = 'div-block';
-    el.id = 'db-'+di;
+    el.className = 'div-block'; el.id = 'db-'+di;
     el.innerHTML = `
       <div class="div-hdr" onclick="toggleDiv(${di})">
         <span class="div-num">DIV ${div.div}</span>
         <span class="div-name">${div.name}</span>
-        <span class="div-tot" id="dt-${di}">${divTot>0?fmt(divTot):'—'}</span>
+        <span class="div-tot" id="dt-${di}">${dt>0?fmt(dt):'—'}</span>
         <span class="div-chev">▼</span>
       </div>
-      <div class="div-items" id="di-${di}">
-        ${div.items.map((it,ii)=>liHTML(it,di,ii)).join('')}
-      </div>`;
+      <div class="div-items" id="di-${di}">${div.items.map((it,ii)=>liHTML(it,di,ii)).join('')}</div>`;
     wrap.appendChild(el);
   });
 }
 
-function liHTML(it, di, ii) {
-  const isOwner = it.remark && /owner|incl\.|included/i.test(it.remark);
+function liHTML(it,di,ii) {
+  const isOwner = it.remark && /owner|incl\./i.test(it.remark);
   return `<div class="li-row">
     <div>
       <div class="li-name">${it.name}</div>
       ${it.remark?`<div class="li-rem ${isOwner?'owner':''}">${it.remark}</div>`:''}
     </div>
-    <input class="${'li-inp'+(isOwner?' owner':'')}"
-      type="${isOwner?'text':'number'}"
-      value="${isOwner?'By Owner':(it.cost||'')}"
-      placeholder="$0" min="0"
-      oninput="updateCost(${di},${ii},this.value)"
-      ${isOwner?'readonly':''} />
+    <input class="li-inp${isOwner?' owner':''}" type="${isOwner?'text':'number'}"
+      value="${isOwner?'By Owner':(it.cost||'')}" placeholder="$0" min="0"
+      oninput="updateCost(${di},${ii},this.value)" ${isOwner?'readonly':''} />
     <div class="li-tot ${(!it.cost||it.cost==0)?'z':''}" id="lt-${di}-${ii}">${it.cost>0?fmt(it.cost):'—'}</div>
   </div>`;
 }
 
-function updateCost(di,ii,val) {
-  const p = getProj();
+function toggleDiv(di) { document.getElementById('db-'+di).classList.toggle('collapsed'); }
+function expandAll()   { document.querySelectorAll('.div-block').forEach(b=>b.classList.remove('collapsed')); }
+function collapseAll() { document.querySelectorAll('.div-block').forEach(b=>b.classList.add('collapsed')); }
+
+async function updateCost(di,ii,val) {
+  const p = getProj(); if(!p) return;
   const cost = parseFloat(val)||0;
   p.divisions[di].items[ii].cost = cost;
   const ltEl = document.getElementById(`lt-${di}-${ii}`);
@@ -1044,29 +722,28 @@ function updateCost(di,ii,val) {
   const dt = p.divisions[di].items.reduce((s,it)=>s+(parseFloat(it.cost)||0),0);
   const dtEl = document.getElementById('dt-'+di);
   if(dtEl) dtEl.textContent=dt>0?fmt(dt):'—';
-  recalc(); save();
+  recalc();
+  // debounced save
+  clearTimeout(p._saveTimer);
+  p._saveTimer = setTimeout(async()=>{ try{ await saveProject(p); }catch(e){} }, 1200);
 }
 
-function toggleDiv(di) { document.getElementById('db-'+di).classList.toggle('collapsed'); }
-function expandAll() { document.querySelectorAll('.div-block').forEach(b=>b.classList.remove('collapsed')); }
-function collapseAll() { document.querySelectorAll('.div-block').forEach(b=>b.classList.add('collapsed')); }
-
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // CALCULATIONS
-// ═══════════════════════════════════════════════════════════════
-function calcSub(p) { return p.divisions.reduce((s,d)=>s+d.items.reduce((ss,it)=>ss+(parseFloat(it.cost)||0),0),0); }
+// ═══════════════════════════════════════════════════════════
+function calcSub(p) { return (p.divisions||[]).reduce((s,d)=>s+d.items.reduce((ss,it)=>ss+(parseFloat(it.cost)||0),0),0); }
 function calcGrand(p) {
-  const sub=calcSub(p), gc=p.pctGC??8, oh=p.pctOH??10, ins=p.pctIns??8;
-  return Math.round(sub*(1+gc/100+oh/100+ins/100));
+  const sub=calcSub(p);
+  return Math.round(sub*(1+(p.pct_gc??8)/100+(p.pct_oh??10)/100+(p.pct_ins??8)/100));
 }
 
 function recalc() {
-  const p = getProj(); if(!p) return;
-  p.pctGC  = parseFloat(document.getElementById('mkGC').value)||8;
-  p.pctOH  = parseFloat(document.getElementById('mkOH').value)||10;
-  p.pctIns = parseFloat(document.getElementById('mkIns').value)||8;
+  const p=getProj(); if(!p) return;
+  p.pct_gc  = parseFloat(document.getElementById('mkGC').value)||8;
+  p.pct_oh  = parseFloat(document.getElementById('mkOH').value)||10;
+  p.pct_ins = parseFloat(document.getElementById('mkIns').value)||8;
   const sub=calcSub(p);
-  const gc=Math.round(sub*p.pctGC/100), oh=Math.round(sub*p.pctOH/100), ins=Math.round(sub*p.pctIns/100);
+  const gc=Math.round(sub*p.pct_gc/100), oh=Math.round(sub*p.pct_oh/100), ins=Math.round(sub*p.pct_ins/100);
   const grand=sub+gc+oh+ins;
   document.getElementById('tSub').textContent=fmt(sub);
   document.getElementById('tGC').textContent=fmt(gc);
@@ -1074,15 +751,15 @@ function recalc() {
   document.getElementById('tIns').textContent=fmt(ins);
   document.getElementById('tGrand').textContent=fmt(grand);
   document.getElementById('statGrand').textContent=fmt(grand);
-  document.getElementById('tGCpct').textContent=p.pctGC+'%';
-  document.getElementById('tOHpct').textContent=p.pctOH+'%';
-  document.getElementById('tInspct').textContent=p.pctIns+'%';
-  save(); renderSidebar();
+  document.getElementById('tGCpct').textContent=p.pct_gc+'%';
+  document.getElementById('tOHpct').textContent=p.pct_oh+'%';
+  document.getElementById('tInspct').textContent=p.pct_ins+'%';
+  renderSidebar();
 }
 
-// ═══════════════════════════════════════════════════════════════
-// ADD LINE ITEM
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+// ADD LINE
+// ═══════════════════════════════════════════════════════════
 function addLineModal() {
   document.getElementById('al_name').value='';
   document.getElementById('al_remark').value='';
@@ -1090,7 +767,7 @@ function addLineModal() {
   document.getElementById('addLineOverlay').classList.add('open');
 }
 function closeAddLine() { document.getElementById('addLineOverlay').classList.remove('open'); }
-function confirmAddLine() {
+async function confirmAddLine() {
   const p=getProj();
   const di=parseInt(document.getElementById('al_div').value);
   const name=document.getElementById('al_name').value.trim();
@@ -1098,250 +775,138 @@ function confirmAddLine() {
   const cost=parseFloat(document.getElementById('al_cost').value)||0;
   const remark=document.getElementById('al_remark').value.trim();
   p.divisions[di].items.push({name,remark,cost});
-  save(); closeAddLine(); renderDivisions(); recalc();
+  await saveProject(p);
+  closeAddLine(); renderDivisions(); recalc();
   toast('Line item added');
 }
 
-// ═══════════════════════════════════════════════════════════════
-// EXPORT — EXCEL
-// ═══════════════════════════════════════════════════════════════
-function exportExcel() {
+// ═══════════════════════════════════════════════════════════
+// EXPORTS
+// ═══════════════════════════════════════════════════════════
+async function exportExcel() {
   const p = getProj();
-  const sub = calcSub(p);
-  const gc  = Math.round(sub*p.pctGC/100);
-  const oh  = Math.round(sub*p.pctOH/100);
-  const ins = Math.round(sub*p.pctIns/100);
-  const grand = sub+gc+oh+ins;
-
-  const wb = XLSX.utils.book_new();
-
-  // ── PROPOSAL SHEET ──
-  const rows = [];
-  rows.push(['NI CONSTRUCTION CORP.','','','','','','']);
-  rows.push(['License #2056165-DCA','','244 5th Ave Suite 2NB, New York NY 10001','','','','']);
-  rows.push([]);
-  rows.push(['BID PROPOSAL','','','','','','']);
-  rows.push([]);
-  rows.push(['PROJECT:', p.address]);
-  rows.push(['ARCHITECT:', p.architect]);
-  rows.push(['PROJECT MANAGER:', p.pm]);
-  rows.push(['BID NUMBER:', p.bidNumber]);
-  rows.push(['DATE:', p.date]);
-  rows.push([]);
-  rows.push(['DIV','DIVISION / LINE ITEM','REMARK','COST']);
-  rows.push(['—','—','—','—']);
-
-  p.divisions.forEach(div => {
-    const divTot = div.items.reduce((s,it)=>s+(parseFloat(it.cost)||0),0);
-    rows.push([div.div, div.name.toUpperCase(), '', divTot||0]);
-    div.items.forEach(it => {
-      rows.push(['', '  ' + it.name, it.remark||'', it.cost||0]);
-    });
-    rows.push([]);
+  // Server-side Excel generation
+  const r = await fetch('/api/export/excel', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    credentials:'include',
+    body: JSON.stringify(p)
   });
-
-  rows.push(['','DIRECT COST SUBTOTAL','',sub]);
-  rows.push(['',`General Conditions (${p.pctGC}%)`, '', gc]);
-  rows.push(['',`Overhead & Profit (${p.pctOH}%)`, '', oh]);
-  rows.push(['',`Insurance (${p.pctIns}%)`, '', ins]);
-  rows.push(['','GRAND TOTAL','',grand]);
-
-  const ws = XLSX.utils.aoa_to_sheet(rows);
-  ws['!cols'] = [{wch:8},{wch:50},{wch:20},{wch:14}];
-  XLSX.utils.book_append_sheet(wb, ws, 'Proposal');
-
-  // ── BID FORM SHEET (architect format) ──
-  const bf = [];
-  bf.push(['BID FORM']);
-  bf.push(['DATE:', new Date().toLocaleDateString()]);
-  bf.push(['PROJECT:', p.address]);
-  bf.push(['ADDRESS:', 'SAME AS ABOVE']);
-  bf.push(['ARCHITECT:', p.architect]);
-  bf.push(['CONTRACTOR:', 'NI Construction Corp.']);
-  bf.push(['PROJECT MANAGER:', p.pm]);
-  bf.push([]);
-  bf.push(['Division #','','','Remark','Division Cost']);
-  bf.push(['02','EXISTING CONDITIONS','','','']);
-
-  p.divisions.forEach(div => {
-    const divTot = div.items.reduce((s,it)=>s+(parseFloat(it.cost)||0),0);
-    bf.push([div.div, div.name,'','', divTot||'']);
-    div.items.forEach(it => bf.push(['', it.name,'', it.remark||'', it.cost||'']));
-  });
-
-  bf.push([]);
-  bf.push(['','SUBTOTAL','','',sub]);
-  bf.push(['','General Conditions','','',gc]);
-  bf.push(['','Overhead','','',oh]);
-  bf.push(['','Insurance','','',ins]);
-  bf.push(['','GRAND TOTAL','','',grand]);
-
-  const ws2 = XLSX.utils.aoa_to_sheet(bf);
-  ws2['!cols'] = [{wch:8},{wch:48},{wch:4},{wch:20},{wch:16}];
-  XLSX.utils.book_append_sheet(wb, ws2, 'Bid Form');
-
-  XLSX.writeFile(wb, `NI-Bid-${p.bidNumber}.xlsx`);
-  toast('Excel downloaded — Proposal + Bid Form sheets');
-}
-
-// ═══════════════════════════════════════════════════════════════
-// EXPORT — PDF (print-to-PDF)
-// ═══════════════════════════════════════════════════════════════
-function exportPDF() {
-  const p = getProj();
-  const sub = calcSub(p);
-  const gc  = Math.round(sub*p.pctGC/100);
-  const oh  = Math.round(sub*p.pctOH/100);
-  const ins = Math.round(sub*p.pctIns/100);
-  const grand = sub+gc+oh+ins;
-
-  let divsHTML = '';
-  p.divisions.forEach(div => {
-    const divTot = div.items.reduce((s,it)=>s+(parseFloat(it.cost)||0),0);
-    if (divTot === 0) return; // Skip empty divisions in PDF
-    divsHTML += `<div class="pdf-div">
-      <div class="pdf-div-hdr">
-        <span>DIV ${div.div} — ${div.name}</span>
-        <span>${fmt(divTot)}</span>
-      </div>`;
-    div.items.forEach(it => {
-      if (!it.cost && !it.remark?.toLowerCase().includes('owner')) return;
-      const isOwner = it.remark && /owner/i.test(it.remark);
-      divsHTML += `<div class="pdf-li ${isOwner?'pdf-li-owner':''}">
-        <span>${it.name}${it.remark?` <em>(${it.remark})</em>`:''}</span>
-        <span>${isOwner?'By Owner':(it.cost?fmt(it.cost):'—')}</span>
-      </div>`;
-    });
-    divsHTML += '</div>';
-  });
-
-  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
-<style>
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{font-family:'Georgia',serif;font-size:11px;color:#1a1a1a;padding:48px;max-width:800px;margin:0 auto;}
-  .hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;padding-bottom:20px;border-bottom:2px solid #1a1a1a;}
-  .co-name{font-size:24px;font-weight:700;letter-spacing:3px;font-family:'Arial',sans-serif;text-transform:uppercase;}
-  .co-sub{font-size:10px;color:#666;letter-spacing:1px;margin-top:4px;}
-  .proj-block{margin-bottom:24px;background:#f8f6f2;padding:16px;border-left:3px solid #c8973a;}
-  .proj-block table{width:100%;border-collapse:collapse;}
-  .proj-block td{padding:3px 8px;font-size:10px;}
-  .proj-block td:first-child{font-weight:700;width:130px;color:#666;text-transform:uppercase;letter-spacing:.5px;}
-  .pdf-div{margin-bottom:12px;}
-  .pdf-div-hdr{display:flex;justify-content:space-between;background:#1a1a1a;color:#fff;padding:6px 10px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
-  .pdf-li{display:flex;justify-content:space-between;padding:5px 10px;border-bottom:1px solid #eee;font-size:10px;}
-  .pdf-li em{color:#888;font-size:9px;}
-  .pdf-li-owner{color:#999;background:#fafafa;}
-  .totals{margin-top:20px;border:2px solid #1a1a1a;}
-  .t-row{display:flex;justify-content:space-between;padding:7px 12px;border-bottom:1px solid #eee;font-size:11px;}
-  .t-grand{background:#1a1a1a;color:#fff;padding:10px 12px;display:flex;justify-content:space-between;font-size:15px;font-weight:700;letter-spacing:1px;}
-  .by-owner-note{margin-top:16px;font-size:9px;color:#888;border-top:1px solid #eee;padding-top:12px;}
-  .sig{margin-top:40px;display:flex;gap:60px;}
-  .sig-line{flex:1;border-top:1px solid #1a1a1a;padding-top:6px;font-size:9px;color:#666;}
-  @media print{body{padding:24px;}}
-</style></head><body>
-<div class="hdr">
-  <div>
-    <div class="co-name">NI Construction Corp.</div>
-    <div class="co-sub">LICENSE #2056165-DCA · 244 5TH AVE SUITE 2NB · NEW YORK, NY 10001</div>
-    <div class="co-sub" style="margin-top:2px">TEL: (212) 555-0100 · NAIM@NICONSTRUCTION.COM</div>
-  </div>
-  <div style="text-align:right">
-    <div style="font-size:18px;font-weight:700;color:#c8973a">PROPOSAL</div>
-    <div style="font-size:10px;color:#666;margin-top:2px">${p.bidNumber}</div>
-    <div style="font-size:10px;color:#666">${p.date}</div>
-  </div>
-</div>
-
-<div class="proj-block">
-  <table>
-    <tr><td>Project</td><td>${p.address}</td></tr>
-    <tr><td>Architect</td><td>${p.architect}</td></tr>
-    <tr><td>Project Manager</td><td>${p.pm}</td></tr>
-    <tr><td>Status</td><td>${p.status.toUpperCase()}</td></tr>
-  </table>
-</div>
-
-${divsHTML}
-
-<div class="totals">
-  <div class="t-row"><span>Direct Cost Subtotal</span><span>${fmt(sub)}</span></div>
-  <div class="t-row"><span>General Conditions (${p.pctGC}%)</span><span>${fmt(gc)}</span></div>
-  <div class="t-row"><span>Overhead & Profit (${p.pctOH}%)</span><span>${fmt(oh)}</span></div>
-  <div class="t-row"><span>Insurance (${p.pctIns}%)</span><span>${fmt(ins)}</span></div>
-  <div class="t-grand"><span>GRAND TOTAL</span><span>${fmt(grand)}</span></div>
-</div>
-
-<div class="by-owner-note">
-  <strong>By Owner:</strong> All plumbing fixture trims, lighting fixtures, tile material/adhesive/grout, appliances, countertops, and interior shelving are by owner unless otherwise noted. NI Construction Corp. to receive, coordinate, and install all owner-supplied items.
-</div>
-
-<div class="sig">
-  <div class="sig-line">NI Construction Corp. — Authorized Signature / Date</div>
-  <div class="sig-line">Owner / Client — Authorized Signature / Date</div>
-</div>
-</body></html>`;
-
-  const win = window.open('', '_blank');
-  win.document.write(html);
-  win.document.close();
-  setTimeout(() => win.print(), 500);
-  toast('PDF opened — use Print → Save as PDF');
-}
-
-// ═══════════════════════════════════════════════════════════════
-// EXPORT — CSV
-// ═══════════════════════════════════════════════════════════════
-function exportCSV() {
-  const p = getProj();
-  let csv = 'Division,Division Name,Line Item,Remark,Cost\n';
-  p.divisions.forEach(d => d.items.forEach(it =>
-    csv += `"${d.div}","${d.name}","${it.name}","${it.remark||''}","${it.cost||0}"\n`
-  ));
-  const sub=calcSub(p);
-  csv += `,,Subtotal,,${sub}\n,,GC (${p.pctGC}%),,${Math.round(sub*p.pctGC/100)}\n`;
-  csv += `,,OH (${p.pctOH}%),,${Math.round(sub*p.pctOH/100)}\n`;
-  csv += `,,Insurance (${p.pctIns}%),,${Math.round(sub*p.pctIns/100)}\n`;
-  csv += `,,GRAND TOTAL,,${calcGrand(p)}\n`;
-  const blob = new Blob([csv],{type:'text/csv'});
+  if(!r.ok){toast('Export failed','err');return;}
+  const blob = await r.blob();
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href=url; a.download=`NI-${p.bidNumber}.csv`; a.click();
+  const a = document.createElement('a'); a.href=url; a.download=`NI-Bid-${p.bid_number}.xlsx`; a.click();
+  toast('Excel downloaded — Proposal + Bid Form');
+}
+
+function exportPDF() {
+  const p=getProj();
+  const sub=calcSub(p), gc=Math.round(sub*p.pct_gc/100), oh=Math.round(sub*p.pct_oh/100), ins=Math.round(sub*p.pct_ins/100), grand=sub+gc+oh+ins;
+  let divsHTML='';
+  (p.divisions||[]).forEach(div=>{
+    const dt=div.items.reduce((s,it)=>s+(parseFloat(it.cost)||0),0);
+    if(!dt) return;
+    divsHTML+=`<div class="pdf-div"><div class="pdf-div-hdr"><span>DIV ${div.div} — ${div.name}</span><span>${fmt(dt)}</span></div>`;
+    div.items.forEach(it=>{
+      if(!it.cost && !(/owner/i.test(it.remark||''))) return;
+      const isO=/owner/i.test(it.remark||'');
+      divsHTML+=`<div class="pdf-li${isO?' pdf-li-o':''}"><span>${it.name}${it.remark?` <em>(${it.remark})</em>`:''}</span><span>${isO?'By Owner':(it.cost?fmt(it.cost):'—')}</span></div>`;
+    });
+    divsHTML+='</div>';
+  });
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:Georgia,serif;font-size:11px;color:#111;padding:44px;max-width:760px;margin:0 auto;}
+    .hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;padding-bottom:16px;border-bottom:2px solid #111;}
+    .co-name{font-size:22px;font-weight:700;letter-spacing:3px;font-family:Arial,sans-serif;text-transform:uppercase;}
+    .co-sub{font-size:9px;color:#555;letter-spacing:1px;margin-top:3px;}
+    .proj{margin-bottom:20px;background:#f8f6f2;padding:14px;border-left:3px solid #c8973a;}
+    .proj table{width:100%;border-collapse:collapse;}
+    .proj td{padding:3px 6px;font-size:10px;}
+    .proj td:first-child{font-weight:700;width:120px;color:#666;text-transform:uppercase;letter-spacing:.5px;}
+    .pdf-div{margin-bottom:10px;}
+    .pdf-div-hdr{display:flex;justify-content:space-between;background:#111;color:#fff;padding:5px 9px;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+    .pdf-li{display:flex;justify-content:space-between;padding:4px 9px;border-bottom:1px solid #eee;font-size:10px;}
+    .pdf-li em{color:#888;font-size:9px;}
+    .pdf-li-o{color:#999;background:#fafafa;}
+    .totals{margin-top:16px;border:2px solid #111;}
+    .t-row{display:flex;justify-content:space-between;padding:6px 11px;border-bottom:1px solid #eee;font-size:11px;}
+    .t-grand{background:#111;color:#fff;padding:9px 11px;display:flex;justify-content:space-between;font-size:14px;font-weight:700;letter-spacing:1px;}
+    .note{margin-top:14px;font-size:9px;color:#888;border-top:1px solid #eee;padding-top:10px;}
+    .sig{margin-top:36px;display:flex;gap:48px;}
+    .sig-line{flex:1;border-top:1px solid #111;padding-top:5px;font-size:9px;color:#666;}
+    @media print{body{padding:24px;}}
+  </style></head><body>
+  <div class="hdr"><div><div class="co-name">NI Construction Corp.</div><div class="co-sub">LICENSE #2056165-DCA · 244 5TH AVE SUITE 2NB · NEW YORK, NY 10001</div></div>
+  <div style="text-align:right"><div style="font-size:16px;font-weight:700;color:#c8973a">PROPOSAL</div><div style="font-size:9px;color:#666;margin-top:2px">${p.bid_number}</div><div style="font-size:9px;color:#666">${p.date}</div></div></div>
+  <div class="proj"><table><tr><td>Project</td><td>${p.address}</td></tr><tr><td>Architect</td><td>${p.architect}</td></tr><tr><td>PM</td><td>${p.pm}</td></tr></table></div>
+  ${divsHTML}
+  <div class="totals">
+    <div class="t-row"><span>Direct Cost Subtotal</span><span>${fmt(sub)}</span></div>
+    <div class="t-row"><span>General Conditions (${p.pct_gc}%)</span><span>${fmt(gc)}</span></div>
+    <div class="t-row"><span>Overhead & Profit (${p.pct_oh}%)</span><span>${fmt(oh)}</span></div>
+    <div class="t-row"><span>Insurance (${p.pct_ins}%)</span><span>${fmt(ins)}</span></div>
+    <div class="t-grand"><span>GRAND TOTAL</span><span>${fmt(grand)}</span></div>
+  </div>
+  <div class="note"><strong>By Owner:</strong> All plumbing fixture trims, lighting fixtures, tile material/adhesive/grout, appliances, countertops, and interior shelving are by owner unless otherwise noted. NI Construction Corp. to receive, coordinate, and install all owner-supplied items.</div>
+  <div class="sig"><div class="sig-line">NI Construction Corp. — Authorized Signature / Date</div><div class="sig-line">Owner / Client — Authorized Signature / Date</div></div>
+  </body></html>`;
+  const win=window.open('','_blank'); win.document.write(html); win.document.close();
+  setTimeout(()=>win.print(),400);
+  toast('PDF opened — Print → Save as PDF');
+}
+
+function exportCSV() {
+  const p=getProj();
+  let csv='Division,Division Name,Line Item,Remark,Cost\n';
+  (p.divisions||[]).forEach(d=>d.items.forEach(it=>csv+=`"${d.div}","${d.name}","${it.name}","${it.remark||''}","${it.cost||0}"\n`));
+  const sub=calcSub(p);
+  csv+=`,,Subtotal,,${sub}\n,,GC,,${Math.round(sub*p.pct_gc/100)}\n,,OH,,${Math.round(sub*p.pct_oh/100)}\n,,Insurance,,${Math.round(sub*p.pct_ins/100)}\n,,GRAND TOTAL,,${calcGrand(p)}\n`;
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=`NI-${p.bid_number}.csv`; a.click();
   toast('CSV downloaded');
 }
 
 function copySummary() {
-  const p = getProj();
-  const sub=calcSub(p), grand=calcGrand(p);
-  const text = `NI Construction Corp. | Bid #${p.bidNumber}\nProject: ${p.address}\nArchitect: ${p.architect}\nDate: ${p.date}\n\nSubtotal: ${fmt(sub)}\nMarkups: ${fmt(grand-sub)}\nGRAND TOTAL: ${fmt(grand)}`;
-  navigator.clipboard.writeText(text).then(()=>toast('Copied to clipboard'));
+  const p=getProj(), sub=calcSub(p), grand=calcGrand(p);
+  navigator.clipboard.writeText(`NI Construction Corp. | Bid #${p.bid_number}\nProject: ${p.address}\nArchitect: ${p.architect}\nDate: ${p.date}\n\nSubtotal: ${fmt(sub)}\nMarkups: ${fmt(grand-sub)}\nGRAND TOTAL: ${fmt(grand)}`).then(()=>toast('Copied to clipboard'));
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // SIDEBAR
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 function renderSidebar() {
-  const list = document.getElementById('projList');
-  list.innerHTML = projects.length ? projects.map(p => {
-    const g = calcGrand(p);
-    return `<div class="proj-item ${p.id===currentId?'active':''}" onclick="openProject('${p.id}')">
-      <div class="proj-addr">${p.address.split(',')[0]}</div>
-      <div class="proj-row">
-        <span class="proj-status s-${p.status}">${p.status.toUpperCase()}</span>
-        <span class="proj-amt">${g>0?fmt(g):'—'}</span>
-      </div>
-    </div>`;
-  }).join('') : '<div style="font-family:\'DM Mono\';font-size:10px;color:var(--muted);padding:8px 4px;">No projects yet</div>';
+  document.getElementById('projList').innerHTML = projects.length
+    ? projects.map(p=>{
+        const g=calcGrand(p);
+        return `<div class="proj-item${p.id===currentId?' active':''}" onclick="openProject('${p.id}')">
+          <div class="proj-addr">${p.address.split(',')[0]}</div>
+          <div class="proj-row">
+            <span class="proj-status s-${p.status}">${p.status.toUpperCase()}</span>
+            <span class="proj-amt">${g>0?fmt(g):'—'}</span>
+          </div></div>`;
+      }).join('')
+    : '<div class="sb-empty">No projects yet</div>';
 }
 
-function changeStatus(val) { const p=getProj(); if(p){p.status=val;save();renderSidebar();} }
-function deleteProject() {
-  if(!confirm('Delete this project?')) return;
-  projects = projects.filter(p=>p.id!==currentId);
-  currentId=null; save(); showUpload(); renderSidebar();
+async function changeStatus(val) {
+  const p=getProj(); if(!p) return;
+  p.status=val;
+  await saveProject(p);
+  renderSidebar();
 }
 
-// ═══════════════════════════════════════════════════════════════
+async function deleteProject() {
+  if(!confirm('Delete this project? Cannot be undone.')) return;
+  await api('DELETE',`/api/projects/${currentId}`);
+  projects=projects.filter(p=>p.id!==currentId);
+  currentId=null;
+  renderSidebar();
+  showUpload();
+}
+
+// ═══════════════════════════════════════════════════════════
 // NAVIGATION
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 function showView(name) {
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-'+name).classList.add('active');
@@ -1351,44 +916,44 @@ function showUpload() {
   uploadedFiles=[];
   renderChips();
   checkReady();
-  // Reset progress steps
   for(let i=0;i<6;i++){
     const s=document.getElementById('step'+i);
-    if(s){s.className='prog-step';s.querySelector('.step-icon').textContent=['📄','🔍','📐','💰','📊','✅'][i];}
+    if(s){s.className='prog-step';s.querySelector('.step-icon').textContent=STEP_ICONS[i];}
   }
+  document.getElementById('progBar').style.width='0%';
 }
-function switchTab(el, id) {
+const STEP_ICONS=['📄','🔍','📐','💰','📊','✅'];
+
+function switchTab(el,id) {
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
-  ['tb-estimate','tb-scope','tb-export'].forEach(tid=>
-    document.getElementById(tid).style.display = tid===id ? 'flex' : 'none'
-  );
-  if(id==='tb-estimate') document.getElementById('tb-estimate').style.flexDirection='column';
+  ['tb-estimate','tb-scope','tb-export'].forEach(tid=>{
+    const el2=document.getElementById(tid);
+    el2.style.display=tid===id?(tid==='tb-estimate'?'flex':'block'):'none';
+    if(tid===id&&tid==='tb-estimate') el2.style.flexDirection='column';
+  });
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // HELPERS
-// ═══════════════════════════════════════════════════════════════
-function fmt(n) { return n!=null ? '$'+Math.round(n).toLocaleString('en-US') : '—'; }
+// ═══════════════════════════════════════════════════════════
+function fmt(n) { return n!=null?'$'+Math.round(n).toLocaleString('en-US'):'—'; }
 
 let _tt;
-function toast(msg, type='') {
+function toast(msg,type=''){
   const t=document.getElementById('toast');
   t.textContent=msg; t.className='show'+(type==='err'?' err':'');
   clearTimeout(_tt); _tt=setTimeout(()=>t.className='',2800);
 }
 
-// Close modal on overlay click
-document.getElementById('addLineOverlay').addEventListener('click', e => {
+document.getElementById('addLineOverlay').addEventListener('click',e=>{
   if(e.target===document.getElementById('addLineOverlay')) closeAddLine();
 });
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // INIT
-// ═══════════════════════════════════════════════════════════════
-load();
-renderSidebar();
-if (projects.length > 0) openProject(projects[0].id);
+// ═══════════════════════════════════════════════════════════
+checkAuth();
 </script>
 </body>
 </html>
