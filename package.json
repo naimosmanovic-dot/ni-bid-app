@@ -1,14 +1,17 @@
 {
   "name": "ni-bid-app",
   "version": "1.0.0",
-  "private": true,
-  "type": "module",
-  "engines": { "node": ">=18" },
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.19.2",
-    "cors": "^2.8.5"
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "multer": "^1.4.5-lts.1",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.1",
+    "xlsx": "^0.18.5",
+    "node-fetch": "^2.7.0",
+    "uuid": "^9.0.0"
   }
 }
